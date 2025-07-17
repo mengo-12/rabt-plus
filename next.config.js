@@ -6,7 +6,7 @@ const nextConfig = {
     // i18n,
     output: 'standalone',
     images: {
-        domains: ['qorza.onrender.com'],
+        domains: ['localhost'],
     },
 };
 
