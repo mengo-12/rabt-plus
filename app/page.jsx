@@ -1,14 +1,22 @@
-'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+// import '../i18n'
 
-export default function Home() {
-    const router = useRouter();
+import Header from '../components/Header'
+import Hero from '../components/Hero'
+import Features from '../components/Features'
+import HowItWorks from '../components/HowItWorks'
+import Testimonials from '../components/Testimonials'
+import Footer from '../components/Footer'
 
-    useEffect(() => {
-        router.replace('/ar'); // أو '/en' لو تريده افتراضي انجليزي
-    }, [router]);
-
-    return null;
+export default function HomePage() {
+    return (
+        <main className="font-sans">
+            <Header />
+            <Hero />
+            <Features />
+            <HowItWorks />
+            <Testimonials />
+            <Footer />
+        </main>
+    )
 }
