@@ -15,17 +15,11 @@ export default function Hero() {
                     {t('hero_subtitle')}
                 </p>
                 <div className="flex justify-center gap-4 flex-wrap">
-                    <a
-                        href="/client-signup"
-                        className="bg-[#3B82F6] hover:bg-blue-600 text-white px-6 py-3 rounded-md shadow transition"
-                    >
-                        {t('hero_client_btn')}
+                    <a href="/client-signup" className="bg-[#3B82F6] hover:bg-blue-600 text-white px-6 py-3 rounded-md shadow transition">
+                        تسجيل كعميل
                     </a>
-                    <a
-                        href="/freelancer-signup"
-                        className="bg-[#10B981] hover:bg-green-600 text-white px-6 py-3 rounded-md shadow transition"
-                    >
-                        {t('hero_freelancer_btn')}
+                    <a href="/freelancer-signup" className="bg-[#10B981] hover:bg-green-600 text-white px-6 py-3 rounded-md shadow transition">
+                        تسجيل كمستقل
                     </a>
                 </div>
             </div>
