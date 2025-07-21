@@ -1,48 +1,32 @@
-// /api/register/route.js
-import { NextResponse } from "next/server"
-import { PrismaClient } from "@prisma/client"
-import bcrypt from "bcryptjs"
-import jwt from "jsonwebtoken"
-
-const prisma = new PrismaClient()
-const JWT_SECRET = process.env.JWT_SECRET || "mysecretkey"
+import { hash } from "bcryptjs";
+import { prisma } from "../../../lib/prisma";
+import { NextResponse } from "next/server";
 
 export async function POST(req) {
-    const { name, email, password, role } = await req.json()
+    const data = await req.json();
+    const { name, email, password, description } = data;
 
-    const existingUser = await prisma.user.findUnique({ where: { email } })
-    if (existingUser) {
-        return NextResponse.json({ message: "البريد الإلكتروني مستخدم بالفعل" }, { status: 400 })
+    if (!name || !email || !password) {
+        return NextResponse.json({ message: "الرجاء تعبئة جميع الحقول" }, { status: 400 });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10)
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser) {
+        return NextResponse.json({ message: "البريد الإلكتروني مستخدم مسبقًا" }, { status: 400 });
+    }
+    
 
-    const newUser = await prisma.user.create({
-        data: { name, email, password: hashedPassword, role },
-    })
+    const hashedPassword = await hash(password, 10);
 
-    // ✅ إنشاء التوكن وتسجيل الدخول تلقائيًا
-    const token = jwt.sign(
-        { id: newUser.id, email: newUser.email, name: newUser.name, role: newUser.role },
-        JWT_SECRET,
-        { expiresIn: "7d" }
-    )
-
-    const res = NextResponse.json({
-        message: "تم إنشاء الحساب",
-        user: {
-            id: newUser.id,
-            email: newUser.email,
-            name: newUser.name,
-            role: newUser.role,
+    await prisma.user.create({
+        data: {
+            name,
+            email,
+            password: hashedPassword,
+            description,
+            role: "freelancer",
         },
-    })
+    });
 
-    res.cookies.set("token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        path: "/",
-    })
-
-    return res
+    return NextResponse.json({ message: "تم إنشاء الحساب بنجاح" }, { status: 201 });
 }

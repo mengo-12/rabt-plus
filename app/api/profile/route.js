@@ -1,96 +1,78 @@
+import { getServerSession } from "next-auth"
+import { authOptions } from "../auth/[...nextauth]/authOptions"
+
 import { NextResponse } from "next/server"
-import { cookies } from "next/headers"
-import jwt from "jsonwebtoken"
-import bcrypt from "bcryptjs"
-import { PrismaClient } from "@prisma/client"
+import { prisma } from "../../../lib/prisma"
 import { writeFile } from "fs/promises"
 import path from "path"
 
-const prisma = new PrismaClient()
-const JWT_SECRET = process.env.JWT_SECRET || "mysecretkey"
+export async function GET(req) {
+    const session = await getServerSession(authOptions)
 
-export async function GET() {
-    const cookieStore = await cookies()
-    const token = cookieStore.get("token")?.value
-
-    if (!token) return NextResponse.json({ message: "غير مصرح" }, { status: 401 })
-
-    try {
-        const decoded = jwt.verify(token, JWT_SECRET)
-
-        const user = await prisma.user.findUnique({
-            where: { email: decoded.email },
-        })
-
-        if (!user) return NextResponse.json({ message: "المستخدم غير موجود" }, { status: 404 })
-
-        return NextResponse.json({
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            avatar: user.avatar,
-            cv: user.cv,
-        })
-    } catch (error) {
-        return NextResponse.json({ message: "جلسة غير صالحة" }, { status: 401 })
+    if (!session) {
+        return NextResponse.json({ message: "غير مصرح" }, { status: 401 })
     }
+
+    const user = await prisma.user.findUnique({
+        where: { email: session.user.email },
+    })
+
+    return NextResponse.json({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        avatar: user.avatar,
+        cv: user.cv,
+        bio: user.bio,
+        description: user.description, // ✅
+    })
 }
 
 export async function PUT(req) {
-    const cookieStore = await cookies()
-    const token = cookieStore.get("token")?.value
-
-    if (!token) return NextResponse.json({ message: "غير مصرح" }, { status: 401 })
-
-    try {
-        const decoded = jwt.verify(token, JWT_SECRET)
-        const formData = await req.formData()
-
-        const name = formData.get("name")
-        const password = formData.get("password")
-        const oldPassword = formData.get("oldPassword")
-        const avatar = formData.get("avatar")
-        const cv = formData.get("cv")
-
-        const user = await prisma.user.findUnique({ where: { email: decoded.email } })
-        if (!user) return NextResponse.json({ message: "المستخدم غير موجود" }, { status: 404 })
-
-        if (oldPassword && !(await bcrypt.compare(oldPassword, user.password))) {
-            return NextResponse.json({ message: "كلمة المرور القديمة غير صحيحة" }, { status: 401 })
-        }
-
-        const updatedData = { name }
-
-        if (password && password.trim() !== "") {
-            const hashed = await bcrypt.hash(password, 10)
-            updatedData.password = hashed
-        }
-
-        if (avatar && avatar.size > 0) {
-            const buffer = Buffer.from(await avatar.arrayBuffer())
-            const fileName = `avatar-${user.id}-${Date.now()}.${avatar.name.split('.').pop()}`
-            const filePath = path.join(process.cwd(), "public", "uploads", fileName)
-            await writeFile(filePath, buffer)
-            updatedData.avatar = `/uploads/${fileName}`
-        }
-
-        if (cv && cv.size > 0) {
-            const buffer = Buffer.from(await cv.arrayBuffer())
-            const fileName = `cv-${user.id}-${Date.now()}.${cv.name.split('.').pop()}`
-            const filePath = path.join(process.cwd(), "public", "uploads", fileName)
-            await writeFile(filePath, buffer)
-            updatedData.cv = `/uploads/${fileName}`
-        }
-
-        await prisma.user.update({
-            where: { email: decoded.email },
-            data: updatedData,
-        })
-
-        return NextResponse.json({ message: "تم تحديث الملف بنجاح" })
-    } catch (err) {
-        console.error("PUT /api/profile error:", err)
-        return NextResponse.json({ message: "خطأ أثناء التحديث" }, { status: 500 })
+    const session = await getServerSession(authOptions)
+    if (!session) {
+        return NextResponse.json({ message: "غير مصرح" }, { status: 401 })
     }
+
+    const data = await req.formData()
+    const bio = data.get("bio")
+    const description = data.get("description")
+    const file = data.get("cv")
+    const avatar = data.get("avatar")
+
+    if (description && description.trim().split(/\s+/).length > 150) {
+        return NextResponse.json(
+            { message: "الوصف طويل جدًا. الحد الأقصى 150 كلمة." },
+            { status: 400 }
+        )
+    }
+
+    const updatedData = {}
+
+    if (bio) updatedData.bio = bio
+    if (description) updatedData.description = description
+
+    if (file && typeof file.name === "string") {
+        const bytes = await file.arrayBuffer()
+        const buffer = Buffer.from(bytes)
+        const filePath = path.join("public/uploads", file.name)
+        await writeFile(filePath, buffer)
+        updatedData.cv = `/uploads/${file.name}`
+    }
+
+    if (avatar && typeof avatar.name === "string") {
+        const bytes = await avatar.arrayBuffer()
+        const buffer = Buffer.from(bytes)
+        const filePath = path.join("public/uploads", avatar.name)
+        await writeFile(filePath, buffer)
+        updatedData.avatar = `/uploads/${avatar.name}`
+    }
+
+    const updatedUser = await prisma.user.update({
+        where: { email: session.user.email },
+        data: updatedData,
+    })
+
+    return NextResponse.json(updatedUser)
 }

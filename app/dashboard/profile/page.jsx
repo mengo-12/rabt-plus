@@ -1,11 +1,12 @@
 'use client'
-
+import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 
 export default function ProfilePage() {
     const router = useRouter()
+    const { data: session, status } = useSession();
     const [name, setName] = useState("")
     const [email, setEmail] = useState("")
     const [role, setRole] = useState("")
@@ -18,10 +19,14 @@ export default function ProfilePage() {
     const [currentCV, setCurrentCV] = useState("")
     const [message, setMessage] = useState("")
     const [loading, setLoading] = useState(true)
+    const [description, setDescription] = useState("")
 
     useEffect(() => {
         const fetchUser = async () => {
-            const res = await fetch("/api/profile", { method: "GET" })
+            const res = await fetch("/api/profile", {
+                method: "GET",
+                credentials: "include", // ✅ ضروري لتمرير الكوكيز
+            })
             if (res.ok) {
                 const data = await res.json()
                 setId(data.id)
@@ -30,6 +35,7 @@ export default function ProfilePage() {
                 setRole(data.role)
                 setCurrentAvatar(data.avatar || "")
                 setCurrentCV(data.cv || "")
+                setDescription(data.description || "")
             } else {
                 router.push("/login")
             }
@@ -39,6 +45,7 @@ export default function ProfilePage() {
         fetchUser()
     }, [router])
 
+
     const handleSubmit = async (e) => {
         e.preventDefault()
         setMessage("")
@@ -47,12 +54,14 @@ export default function ProfilePage() {
         formData.append("name", name)
         formData.append("password", password)
         formData.append("oldPassword", oldPassword)
+        formData.append("description", description)
         if (avatar) formData.append("avatar", avatar)
         if (cv) formData.append("cv", cv)
 
         const res = await fetch("/api/profile", {
             method: "PUT",
             body: formData,
+            credentials: "include", // اختياري لكن يُفضل
         })
 
         const data = await res.json()
@@ -90,7 +99,7 @@ export default function ProfilePage() {
                 {currentAvatar && (
                     <div className="text-center">
                         <img
-                            src={currentAvatar}
+                            src={currentAvatar || "/default-avatar.png"}
                             alt="الصورة الشخصية"
                             className="w-24 h-24 rounded-full mx-auto mb-4 object-cover"
                         />
@@ -147,6 +156,19 @@ export default function ProfilePage() {
                         value={email}
                         readOnly
                     />
+                </div>
+
+                <div>
+                    <label className="block font-medium mb-1 text-black">الوصف التفصيلي عنك</label>
+                    <textarea
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        className="w-full border rounded p-2 text-black"
+                        placeholder="أخبرنا عن خبراتك، المهارات التي تتقنها، المشاريع السابقة، إلخ"
+                        rows={5}
+                        maxLength={1000}
+                    />
+                    <p className="text-sm text-gray-500 mt-1">الحد الأقصى 150 كلمة تقريبًا</p>
                 </div>
 
                 <div>

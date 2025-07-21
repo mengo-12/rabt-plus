@@ -3,6 +3,7 @@
 const rtl = require('tailwindcss-rtl');
 
 module.exports = {
+    darkMode: 'class',
     content: [
         "./src/**/*.{js,ts,jsx,tsx}",
         './node_modules/flowbite-react/**/*.js',
@@ -16,7 +17,6 @@ module.exports = {
         "keen-slider",
         "keen-slider__slide"
     ],
-    darkMode: 'class',
     theme: {
         extend: {
             fontFamily: {

@@ -1,50 +1,131 @@
-'use client'
+// 'use client';
+// import { signIn } from 'next-auth/react';
+// import { useState } from 'react';
+// import { useRouter } from 'next/navigation';
+// import { useSession } from 'next-auth/react';
+// import { useEffect } from 'react';
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+
+// export default function LoginPage() {
+//     const router = useRouter();
+//     const [email, setEmail] = useState('');
+//     const [password, setPassword] = useState('');
+//     const [error, setError] = useState('');
+
+//     const handleLogin = async (e) => {
+//         e.preventDefault();
+
+
+//         const res = await signIn('credentials', {
+//             redirect: false, // لا تتركه true
+//             email,
+//             password,
+//         });
+
+//         if (res?.error) {
+//             setError('بيانات الدخول غير صحيحة');
+//         } else if (res.ok) {
+//             router.push('/dashboard/profile'); // توجيه يدوي ناجح
+//         }
+
+
+
+// const res = await signIn('credentials', {
+//     redirect: false,
+//     email,
+//     password,
+//     callbackUrl: '/dashboard/profile',
+// });
+
+// if (res?.error) {
+//     setError('بيانات الدخول غير صحيحة');
+// } else {
+//     router.push('/dashboard/profile');
+// }
+// };
+
+
+// const { data: session } = useSession();
+
+// useEffect(() => {
+//     if (session?.user) {
+//         router.push('/dashboard/profile');
+//     }
+// }, [session]);
+
+
+//     return (
+//         <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow">
+//             <h2 className="text-2xl font-bold mb-4">تسجيل الدخول</h2>
+//             {error && <p className="text-red-600 mb-4">{error}</p>}
+//             <form onSubmit={handleLogin} className="space-y-4">
+//                 <input
+//                     type="email"
+//                     placeholder="البريد الإلكتروني"
+//                     value={email}
+//                     onChange={(e) => setEmail(e.target.value)}
+//                     className="w-full border rounded p-2"
+//                     required
+//                 />
+//                 <input
+//                     type="password"
+//                     placeholder="كلمة المرور"
+//                     value={password}
+//                     onChange={(e) => setPassword(e.target.value)}
+//                     className="w-full border rounded p-2"
+//                     required
+//                 />
+//                 <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded">
+//                     دخول
+//                 </button>
+//             </form>
+//         </div>
+//     );
+// }
+
+
+'use client';
+import { signIn } from 'next-auth/react';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
-    const router = useRouter()
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [error, setError] = useState('')
+    const router = useRouter();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
 
     const handleLogin = async (e) => {
-        e.preventDefault()
-        setError('')
+        e.preventDefault();
 
-        const res = await fetch('/api/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password }),
-        })
+        const res = await signIn('credentials', {
+            redirect: false,
+            email,
+            password,
+            callbackUrl: '/dashboard/profile',
+        });
+        
+        console.log('signIn response:', res); // تحقق من هذه البيانات
 
-        const data = await res.json()
 
-        if (!res.ok) {
-            setError(data.message)
-            return
+        if (res?.error) {
+            setError('بيانات الدخول غير صحيحة');
+        } else if (res.ok) {
+            router.push('/dashboard/profile');
         }
-
-        // توجيه حسب الدور بعد تسجيل الدخول
-        if (data.role === 'freelancer') {
-            router.push('/dashboard/profile') // توجيه المستقل لصفحة الملف الشخصي داخل داشبورد
-        } else {
-            router.push('/dashboard') // توجيه العملاء إلى الصفحة الرئيسية للداشبورد
-        }
-    }
+    };
 
     return (
-        <div className="max-w-md mx-auto mt-10 bg-white p-6 rounded shadow">
-            <h1 className="text-2xl font-bold mb-4 text-black">تسجيل الدخول</h1>
-            {error && <p className="text-red-500 mb-4">{error}</p>}
-            <form onSubmit={handleLogin}>
+        <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow">
+            <h2 className="text-2xl font-bold mb-4">تسجيل الدخول</h2>
+            {error && <p className="text-red-600 mb-4">{error}</p>}
+            <form onSubmit={handleLogin} className="space-y-4">
                 <input
                     type="email"
                     placeholder="البريد الإلكتروني"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full mb-3 p-2 border rounded text-black"
+                    className="w-full border rounded p-2"
                     required
                 />
                 <input
@@ -52,19 +133,14 @@ export default function LoginPage() {
                     placeholder="كلمة المرور"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full mb-3 p-2 border rounded text-black"
+                    className="w-full border rounded p-2"
                     required
                 />
                 <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded">
                     دخول
                 </button>
             </form>
-            <p className="mt-4 text-center">
-                لا تملك حساب؟{' '}
-                <a href="/register" className="text-blue-600 underline">
-                    سجل الآن
-                </a>
-            </p>
         </div>
-    )
+    );
 }
+

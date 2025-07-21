@@ -1,95 +1,96 @@
-// register/page.jsx
-"use client"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+'use client';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
-    const router = useRouter()
+    const router = useRouter();
     const [form, setForm] = useState({
-        name: "",
-        email: "",
-        password: "",
-        role: "freelancer",
-    })
+        name: '',
+        email: '',
+        password: '',
+        description: '',
+    });
+    const [error, setError] = useState('');
 
-    const [message, setMessage] = useState("")
-    const [loading, setLoading] = useState(false)
+    const handleChange = (e) => {
+        setForm({ ...form, [e.target.name]: e.target.value });
+    };
 
     const handleSubmit = async (e) => {
-        e.preventDefault()
-        setLoading(true)
-        const res = await fetch("/api/register", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(form),
-        })
+        e.preventDefault();
 
-        const data = await res.json()
-        setLoading(false)
+        if (form.description.length > 500) {
+            return setError('الوصف طويل جدًا (الحد 500 حرف)');
+        }
+
+        const res = await fetch('/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(form),
+        });
 
         if (res.ok) {
-            if (data.user.role === "freelancer") {
-                router.push("/dashboard/profile")
-            } else {
-                router.push("/dashboard")
-            }
+            router.push('/login');
         } else {
-            setMessage(data.message || "فشل التسجيل")
+            let errorMessage = 'حدث خطأ أثناء التسجيل';
+            try {
+                const data = await res.json();
+                errorMessage = data.message || errorMessage;
+            } catch (err) {
+                // الرد لم يكن JSON صالح أو فارغ
+                console.error("Failed to parse error response", err);
+            }
+            setError(errorMessage);
         }
-    }
+    };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-            <div className="bg-white shadow-xl rounded-lg w-full max-w-md p-8 space-y-6">
-                <h2 className="text-2xl font-bold text-center text-gray-800">إنشاء حساب</h2>
-
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <input
-                        type="text"
-                        placeholder="الاسم الكامل"
-                        value={form.name}
-                        onChange={(e) => setForm({ ...form, name: e.target.value })}
-                        className="w-full p-2 border rounded text-black"
-                        required
-                    />
-                    <input
-                        type="email"
-                        placeholder="البريد الإلكتروني"
-                        value={form.email}
-                        onChange={(e) => setForm({ ...form, email: e.target.value })}
-                        className="w-full p-2 border rounded text-black"
-                        required
-                    />
-                    <input
-                        type="password"
-                        placeholder="كلمة المرور"
-                        value={form.password}
-                        onChange={(e) => setForm({ ...form, password: e.target.value })}
-                        className="w-full p-2 border rounded text-black"
-                        required
-                    />
-                    <select
-                        value={form.role}
-                        onChange={(e) => setForm({ ...form, role: e.target.value })}
-                        className="w-full p-2 border rounded text-black"
-                    >
-                        <option value="freelancer">مستقل</option>
-                        <option value="client">صاحب مشروع</option>
-                    </select>
-
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition"
-                    >
-                        {loading ? "جاري التسجيل..." : "تسجيل"}
-                    </button>
-
-                    {message && (
-                        <p className="text-center text-sm text-red-600 mt-2">{message}</p>
-                    )}
-                </form>
-            </div>
+        <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow">
+            <h2 className="text-2xl font-bold mb-4">تسجيل حساب مستقل</h2>
+            {error && <p className="text-red-600 mb-4">{error}</p>}
+            <form onSubmit={handleSubmit} className="space-y-4">
+                <input
+                    name="name"
+                    placeholder="الاسم"
+                    value={form.name}
+                    onChange={handleChange}
+                    className="w-full border rounded p-2"
+                    required
+                />
+                <input
+                    name="email"
+                    type="email"
+                    placeholder="البريد الإلكتروني"
+                    value={form.email}
+                    onChange={handleChange}
+                    className="w-full border rounded p-2"
+                    required
+                />
+                <input
+                    name="password"
+                    type="password"
+                    placeholder="كلمة المرور"
+                    value={form.password}
+                    onChange={handleChange}
+                    className="w-full border rounded p-2"
+                    required 
+                />
+                <textarea
+                    name="description"
+                    placeholder="نبذة عنك، مهاراتك، لغاتك"
+                    value={form.description}
+                    onChange={handleChange}
+                    className="w-full border rounded p-2"
+                    rows={4}
+                    maxLength={500}
+                />
+                <p className="text-sm text-gray-500 text-right">
+                    الحد الأقصى 500 حرف
+                </p>
+                <button type="submit" className="w-full bg-green-600 text-white py-2 rounded">
+                    إنشاء حساب
+                </button>
+            </form>
         </div>
-    )
+    );
 }

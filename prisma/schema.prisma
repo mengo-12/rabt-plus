@@ -23,6 +23,8 @@ model User {
   email     String   @unique
   password  String
   role      Role
+  bio       String?  // وصف قصير
+  description String?
   avatar    String?  // رابط الصورة الشخصية، اختياري
   cv        String?  // رابط ملف السيرة الذاتية، اختياري
   createdAt DateTime @default(now())
