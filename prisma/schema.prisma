@@ -18,17 +18,19 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  password  String
-  role      Role
-  bio       String?  // وصف قصير
+  id          String   @id @default(cuid())
+  name        String
+  email       String   @unique
+  password    String
+  role        Role
+  bio         String?
   description String?
-  avatar    String?  // رابط الصورة الشخصية، اختياري
-  cv        String?  // رابط ملف السيرة الذاتية، اختياري
-  createdAt DateTime @default(now())
+  avatar      String?
+  cv          String?
+  rating      Float?   @default(0)
+  createdAt   DateTime @default(now())
 }
+
 
 enum Role {
   client

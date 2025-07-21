@@ -8,7 +8,6 @@ export default function RegisterPage() {
         name: '',
         email: '',
         password: '',
-        description: '',
     });
     const [error, setError] = useState('');
 
@@ -19,14 +18,10 @@ export default function RegisterPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (form.description.length > 500) {
-            return setError('الوصف طويل جدًا (الحد 500 حرف)');
-        }
-
         const res = await fetch('/api/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(form),
+            body: JSON.stringify({ ...form, role: 'freelancer' }),
         });
 
         if (res.ok) {
@@ -73,20 +68,8 @@ export default function RegisterPage() {
                     value={form.password}
                     onChange={handleChange}
                     className="w-full border rounded p-2"
-                    required 
+                    required
                 />
-                <textarea
-                    name="description"
-                    placeholder="نبذة عنك، مهاراتك، لغاتك"
-                    value={form.description}
-                    onChange={handleChange}
-                    className="w-full border rounded p-2"
-                    rows={4}
-                    maxLength={500}
-                />
-                <p className="text-sm text-gray-500 text-right">
-                    الحد الأقصى 500 حرف
-                </p>
                 <button type="submit" className="w-full bg-green-600 text-white py-2 rounded">
                     إنشاء حساب
                 </button>

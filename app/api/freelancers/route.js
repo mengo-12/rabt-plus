@@ -22,26 +22,49 @@
 // }
 
 
-import { prisma } from '../../../lib/prisma'
-import { NextResponse } from "next/server"
+// import { prisma } from '../../../lib/prisma'
+// import { NextResponse } from "next/server"
+
+// export async function GET() {
+//     try {
+//         const freelancers = await prisma.user.findMany({
+//             where: { role: 'freelancer' },
+//             select: {
+//                 id: true,
+//                 name: true,
+//                 avatar: true,
+//                 bio: true,
+//                 description: true,
+//             },
+//         });
+
+//         return NextResponse.json(freelancers);
+//     } catch (error) {
+//         console.error("فشل في جلب بيانات المستقلين:", error);
+//         return NextResponse.json({ message: "حدث خطأ" }, { status: 500 });
+//     }
+// }
+
+import { NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
 
 export async function GET() {
-    try {
-        const freelancers = await prisma.user.findMany({
-            where: { role: 'freelancer' },
-            select: {
-                id: true,
-                name: true,
-                avatar: true,
-                bio: true,
-                description: true,
-            },
-        });
+    const freelancers = await prisma.user.findMany({
+        where: {
+            role: 'freelancer'
+        },
+        select: {
+            id: true,
+            name: true,
+            bio: true,
+            avatar: true
+        },
+        // orderBy: {
+        //     createdAt: 'desc'
+        // }
+    })
 
-        return NextResponse.json(freelancers);
-    } catch (error) {
-        console.error("فشل في جلب بيانات المستقلين:", error);
-        return NextResponse.json({ message: "حدث خطأ" }, { status: 500 });
-    }
+    return NextResponse.json(freelancers)
 }
+
 

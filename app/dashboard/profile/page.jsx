@@ -20,6 +20,7 @@ export default function ProfilePage() {
     const [message, setMessage] = useState("")
     const [loading, setLoading] = useState(true)
     const [description, setDescription] = useState("")
+    const [bio, setBio] = useState("")
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -36,6 +37,7 @@ export default function ProfilePage() {
                 setCurrentAvatar(data.avatar || "")
                 setCurrentCV(data.cv || "")
                 setDescription(data.description || "")
+                setBio(data.bio || "")
             } else {
                 router.push("/login")
             }
@@ -55,6 +57,7 @@ export default function ProfilePage() {
         formData.append("password", password)
         formData.append("oldPassword", oldPassword)
         formData.append("description", description)
+        formData.append("bio", bio)
         if (avatar) formData.append("avatar", avatar)
         if (cv) formData.append("cv", cv)
 
@@ -156,6 +159,19 @@ export default function ProfilePage() {
                         value={email}
                         readOnly
                     />
+                </div>
+
+                <div>
+                    <label className="block font-medium mb-1 text-black">نبذة عني</label>
+                    <textarea
+                        value={bio}
+                        onChange={(e) => setBio(e.target.value)}
+                        className="w-full border rounded p-2 text-black"
+                        placeholder="اكتب نبذة قصيرة عنك تظهر في صفحتك العامة"
+                        rows={3}
+                        maxLength={300}
+                    />
+                    <p className="text-sm text-gray-500 mt-1">الحد الأقصى 300 حرف</p>
                 </div>
 
                 <div>

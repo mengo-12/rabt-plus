@@ -37,7 +37,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(req) {
     const data = await req.json();
-    const { name, email, password, description, role } = data;
+    const { name, email, password, role } = data;
 
     if (!name || !email || !password || !role) {
         return NextResponse.json({ message: "الرجاء تعبئة جميع الحقول" }, { status: 400 });
@@ -55,7 +55,6 @@ export async function POST(req) {
             name,
             email,
             password: hashedPassword,
-            description: description || '',
             role, // من العميل
         },
     });
