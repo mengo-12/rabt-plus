@@ -38,7 +38,7 @@ export default function AllFreelancersPage() {
                     placeholder="ابحث باسم المستقل..."
                     value={search}
                     onChange={e => setSearch(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:border-primary dark:bg-gray-800 dark:text-white"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
                 />
             </div>
 
@@ -49,16 +49,16 @@ export default function AllFreelancersPage() {
                         <Link
                             key={freelancer.id}
                             href={`/freelancers/${freelancer.id}`}
-                            className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 hover:shadow-md transition"
+                            className="bg-white dark:bg-gray-800 rounded-2xl shadow hover:shadow-lg transition border border-gray-200 dark:border-gray-700 p-4"
                         >
                             <div className="flex flex-col items-center text-center">
                                 <img
                                     src={freelancer.avatar || '/default-avatar.png'}
                                     alt={freelancer.name}
-                                    className="w-20 h-20 rounded-full object-cover mb-3"
+                                    className="w-20 h-20 rounded-full object-cover mb-3 border-4 border-blue-500"
                                 />
-                                <h2 className="text-lg font-semibold text-gray-800 dark:text-white">{freelancer.name}</h2>
-                                <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">{freelancer.bio}</p>
+                                <h2 className="text-lg font-bold">{freelancer.name}</h2>
+                                <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{freelancer.bio}</p>
                             </div>
                         </Link>
                     ))

@@ -131,64 +131,47 @@ export default function FreelancerPage() {
 
     return (
         <div className="container mx-auto px-4 py-12 max-w-3xl">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                {/* معلومات المستقل */}
-                <div className="flex flex-col items-center text-center">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+                <div className="flex flex-col items-center">
                     <img
                         src={freelancer.avatar || '/default-avatar.png'}
-                        alt={freelancer.name}
-                        className="w-28 h-28 rounded-full object-cover mb-4"
+                        className="w-28 h-28 rounded-full border-4 border-blue-500 mb-4"
                     />
-                    <h1 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">{freelancer.name}</h1>
-                    <p className="text-gray-600 dark:text-gray-300 mb-4">{freelancer.bio || 'لا توجد نبذة حالياً'}</p>
+                    <h1 className="text-2xl font-bold text-center">{freelancer.name}</h1>
+                    <p className="text-gray-500 mt-2">{freelancer.bio}</p>
                 </div>
 
-                {/* الوصف الكامل */}
-                <div className="mt-6">
-                    <h2 className="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-200">الوصف الكامل</h2>
-                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
-                        {freelancer.description || 'لا يوجد وصف حالياً'}
-                    </p>
+                <div className="mt-6 space-y-4">
+                    <section>
+                        <h2 className="text-lg font-semibold">الوصف الكامل</h2>
+                        <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">{freelancer.description}</p>
+                    </section>
+
+                    <section>
+                        <h2 className="text-lg font-semibold">المهارات</h2>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                            {['تصميم', 'React', 'Node.js'].map(skill => (
+                                <span key={skill} className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-3 py-1 rounded-full text-sm">
+                                    {skill}
+                                </span>
+                            ))}
+                        </div>
+                    </section>
+
+                    {freelancer.cv && (
+                        <section>
+                            <a href={freelancer.cv} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-300 underline">
+                                تحميل السيرة الذاتية
+                            </a>
+                        </section>
+                    )}
+
+                    {isClient && (
+                        <div className="text-center mt-6">
+                            <button className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition">تواصل مع المستقل</button>
+                        </div>
+                    )}
                 </div>
-
-                {/* المهارات */}
-                <div className="mt-6">
-                    <h2 className="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-200">المهارات</h2>
-                    <div className="flex flex-wrap gap-2">
-                        {/* يمكنك لاحقًا جلب المهارات من قاعدة البيانات */}
-                        {['تصميم', 'React', 'Node.js'].map(skill => (
-                            <span
-                                key={skill}
-                                className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-3 py-1 rounded-full text-sm"
-                            >
-                                {skill}
-                            </span>
-                        ))}
-                    </div>
-                </div>
-
-                {/* رابط السيرة الذاتية */}
-                {freelancer.cv && (
-                    <div className="mt-6">
-                        <a
-                            href={freelancer.cv}
-                            target="_blank"
-                            className="text-primary underline dark:text-blue-300"
-                            rel="noopener noreferrer"
-                        >
-                            تحميل السيرة الذاتية
-                        </a>
-                    </div>
-                )}
-
-                {/* زر التواصل */}
-                {isClient && (
-                    <div className="mt-8 text-center">
-                        <button className="bg-primary text-white px-6 py-2 rounded hover:bg-primary-dark transition">
-                            تواصل مع المستقل
-                        </button>
-                    </div>
-                )}
             </div>
         </div>
     )

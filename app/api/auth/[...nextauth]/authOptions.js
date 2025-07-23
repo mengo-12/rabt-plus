@@ -81,6 +81,7 @@ export const authOptions = {
                     name: user.name,
                     email: user.email,
                     role: user.role,
+                    avatar: user.avatar,
                 };
             }
         })
@@ -98,12 +99,14 @@ export const authOptions = {
             if (user) {
                 token.id = user.id;
                 token.role = user.role;
+                token.avatar = user.avatar;
             }
             return token;
         },
         async session({ session, token }) {
             session.user.id = token.id;
             session.user.role = token.role;
+            session.user.avatar = token.avatar;
             return session;
         },
         async redirect({ url, baseUrl }) {

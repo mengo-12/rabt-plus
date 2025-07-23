@@ -55,10 +55,8 @@
 
 // dashboard/layout.jsx
 import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]/authOptions"; // تأكد من المسار
-import Link from "next/link";
+import { authOptions } from "../api/auth/[...nextauth]/authOptions";
 import { redirect } from "next/navigation";
-import ButtonLogout from "../../components/ButtonLogout";
 
 export default async function DashboardLayout({ children }) {
     const session = await getServerSession(authOptions);
@@ -68,33 +66,15 @@ export default async function DashboardLayout({ children }) {
     }
 
     return (
-        <div className="min-h-screen flex bg-gray-100">
-            {/* Sidebar */}
-            <aside className="w-64 bg-white shadow-md p-6">
-                <h2 className="text-xl font-bold mb-4">لوحة التحكم</h2>
-                <ul className="space-y-2">
-                    <li>
-                        <Link href="/dashboard" className="text-blue-600">
-                            الرئيسية
-                        </Link>
-                    </li>
-                    <li>
-                        <Link href="/dashboard/profile" className="text-blue-600">
-                            الملف الشخصي
-                        </Link>
-                    </li>
-                    <ButtonLogout />
-                </ul>
-            </aside>
+        <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-white p-4">
+            <header className="mb-6 border-b border-gray-300 dark:border-gray-700 pb-4">
+                <p className="text-lg font-semibold">
+                    مرحبًا، {session.user.name}
+                </p>
+            </header>
 
-            {/* Main Content */}
-            <main className="flex-1 p-6">
-                <header className="mb-6">
-                    <p className="text-gray-700">مرحبًا، {session.user.name}</p>
-                </header>
-
-                {children}
-            </main>
+            <main>{children}</main>
         </div>
     );
 }
+
