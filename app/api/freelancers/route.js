@@ -50,21 +50,40 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET() {
     const freelancers = await prisma.user.findMany({
-        where: {
-            role: 'freelancer'
-        },
+        where: { role: 'freelancer' },
         select: {
             id: true,
             name: true,
+            avatar: true,
             bio: true,
-            avatar: true
+            freelancerRatings: {
+                select: {
+                    rating: true,
+                },
+            },
         },
-        // orderBy: {
-        //     createdAt: 'desc'
-        // }
     })
 
-    return NextResponse.json(freelancers)
+    const formatted = freelancers.map(f => {
+        const ratings = f.freelancerRatings.map(r => r.rating)
+        const reviewsCount = ratings.length
+        const avgRating =
+            reviewsCount > 0
+                ? ratings.reduce((a, b) => a + b, 0) / reviewsCount
+                : 0
+
+        return {
+            id: f.id,
+            name: f.name,
+            avatar: f.avatar,
+            bio: f.bio,
+            avgRating,
+            reviewsCount,
+        }
+    })
+
+    return NextResponse.json(formatted)
 }
+
 
 

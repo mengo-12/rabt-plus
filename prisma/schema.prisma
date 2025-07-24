@@ -17,6 +17,26 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  client
+  freelancer
+}
+
+model Rating {
+  id            String   @id @default(cuid())
+  rating        Int
+  comment       String?
+  createdAt     DateTime @default(now())
+
+  freelancerId  String
+  freelancer    User     @relation(name: "FreelancerRatings", fields: [freelancerId], references: [id])
+
+  clientId      String
+  client        User     @relation(name: "ClientRatings", fields: [clientId], references: [id])
+
+  @@unique([freelancerId, clientId])
+}
+
 model User {
   id          String   @id @default(cuid())
   name        String
@@ -29,10 +49,8 @@ model User {
   cv          String?
   rating      Float?   @default(0)
   createdAt   DateTime @default(now())
-}
 
-
-enum Role {
-  client
-  freelancer
+  // العلاقات العكسية
+  freelancerRatings Rating[] @relation("FreelancerRatings")
+  clientRatings     Rating[] @relation("ClientRatings")
 }
