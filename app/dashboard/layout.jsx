@@ -66,6 +66,7 @@ export default async function DashboardLayout({ children }) {
     }
 
     return (
+        
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-white p-4">
             <header className="mb-6 border-b border-gray-300 dark:border-gray-700 pb-4">
                 <p className="text-lg font-semibold">

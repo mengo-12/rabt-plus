@@ -9,7 +9,6 @@
 
 generator client {
   provider = "prisma-client-js"
-
 }
 
 datasource db {
@@ -23,16 +22,16 @@ enum Role {
 }
 
 model Rating {
-  id            String   @id @default(cuid())
-  rating        Int
-  comment       String?
-  createdAt     DateTime @default(now())
+  id        String   @id @default(cuid())
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
 
-  freelancerId  String
-  freelancer    User     @relation(name: "FreelancerRatings", fields: [freelancerId], references: [id])
+  freelancerId String
+  freelancer   User   @relation(name: "FreelancerRatings", fields: [freelancerId], references: [id])
 
-  clientId      String
-  client        User     @relation(name: "ClientRatings", fields: [clientId], references: [id])
+  clientId String
+  client   User   @relation(name: "ClientRatings", fields: [clientId], references: [id])
 
   @@unique([freelancerId, clientId])
 }
@@ -43,6 +42,7 @@ model User {
   email       String   @unique
   password    String
   role        Role
+  phone       String?  // <- أضف هذا السطر ليصبح رقم الهاتف اختياري
   bio         String?
   description String?
   avatar      String?
@@ -53,4 +53,29 @@ model User {
   // العلاقات العكسية
   freelancerRatings Rating[] @relation("FreelancerRatings")
   clientRatings     Rating[] @relation("ClientRatings")
+
+  projects  Project[]  @relation("ClientProjects") // المشاريع التي أنشأها العميل
+  proposals Proposal[] @relation("FreelancerProposals") // العروض التي قدمها المستقل
+}
+
+model Project {
+  id          String     @id @default(cuid())
+  title       String
+  description String
+  budget      Float?
+  createdAt   DateTime   @default(now())
+  clientId    String
+  client      User       @relation("ClientProjects", fields: [clientId], references: [id])
+  proposals   Proposal[]
+}
+
+model Proposal {
+  id           String   @id @default(cuid())
+  message      String
+  price        Float
+  createdAt    DateTime @default(now())
+  projectId    String
+  project      Project  @relation(fields: [projectId], references: [id])
+  freelancerId String
+  freelancer   User     @relation("FreelancerProposals", fields: [freelancerId], references: [id])
 }

@@ -8,6 +8,7 @@ export default function RegisterPage() {
         name: '',
         email: '',
         password: '',
+        phone: '', // ✅ إضافة رقم الهاتف
     });
     const [error, setError] = useState('');
 
@@ -21,7 +22,7 @@ export default function RegisterPage() {
         const res = await fetch('/api/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...form, role: 'freelancer' }),
+            body: JSON.stringify({ ...form, role: 'freelancer' }), // ✅ إرسال رقم الهاتف
         });
 
         if (res.ok) {
@@ -32,7 +33,6 @@ export default function RegisterPage() {
                 const data = await res.json();
                 errorMessage = data.message || errorMessage;
             } catch (err) {
-                // الرد لم يكن JSON صالح أو فارغ
                 console.error("Failed to parse error response", err);
             }
             setError(errorMessage);
@@ -57,6 +57,15 @@ export default function RegisterPage() {
                     type="email"
                     placeholder="البريد الإلكتروني"
                     value={form.email}
+                    onChange={handleChange}
+                    className="w-full border rounded p-2"
+                    required
+                />
+                <input
+                    name="phone"
+                    type="tel"
+                    placeholder="رقم الهاتف"
+                    value={form.phone}
                     onChange={handleChange}
                     className="w-full border rounded p-2"
                     required

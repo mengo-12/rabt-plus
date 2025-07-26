@@ -10,6 +10,7 @@
     "postinstall": "flowbite-react patch"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "@prisma/client": "^6.11.1",
     "bcryptjs": "^3.0.2",
     "clsx": "^2.1.1",

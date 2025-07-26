@@ -22,13 +22,11 @@ module.exports = {
             fontFamily: {
                 cairo: ['Cairo', 'sans-serif'],
                 roboto: ['Roboto', 'sans-serif'],
+                tajawal: ['Tajawal', 'sans-serif'],
             },
             colors: {
-                primary: '#4F46E5',       // اللون الرئيسي (بنفسجي)
-                secondary: '#6366F1',     // لون ثانوي
-                accent: '#FBBF24',        // لون مميز (أصفر)
-                dark: '#1F2937',          // رمادي غامق
-                light: '#F9FAFB',         // رمادي فاتح
+                primary: '#00bfa6', // تركواز
+                secondary: '#1f2937', // رمادي غامق
             },
         },
     },

@@ -1,93 +1,10 @@
-// 'use client';
-// import { signIn } from 'next-auth/react';
-// import { useState } from 'react';
-// import { useRouter } from 'next/navigation';
-// import { useSession } from 'next-auth/react';
-// import { useEffect } from 'react';
-
-
-// export default function LoginPage() {
-//     const router = useRouter();
-//     const [email, setEmail] = useState('');
-//     const [password, setPassword] = useState('');
-//     const [error, setError] = useState('');
-
-//     const handleLogin = async (e) => {
-//         e.preventDefault();
-
-
-//         const res = await signIn('credentials', {
-//             redirect: false, // لا تتركه true
-//             email,
-//             password,
-//         });
-
-//         if (res?.error) {
-//             setError('بيانات الدخول غير صحيحة');
-//         } else if (res.ok) {
-//             router.push('/dashboard/profile'); // توجيه يدوي ناجح
-//         }
-
-
-
-// const res = await signIn('credentials', {
-//     redirect: false,
-//     email,
-//     password,
-//     callbackUrl: '/dashboard/profile',
-// });
-
-// if (res?.error) {
-//     setError('بيانات الدخول غير صحيحة');
-// } else {
-//     router.push('/dashboard/profile');
-// }
-// };
-
-
-// const { data: session } = useSession();
-
-// useEffect(() => {
-//     if (session?.user) {
-//         router.push('/dashboard/profile');
-//     }
-// }, [session]);
-
-
-//     return (
-//         <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow">
-//             <h2 className="text-2xl font-bold mb-4">تسجيل الدخول</h2>
-//             {error && <p className="text-red-600 mb-4">{error}</p>}
-//             <form onSubmit={handleLogin} className="space-y-4">
-//                 <input
-//                     type="email"
-//                     placeholder="البريد الإلكتروني"
-//                     value={email}
-//                     onChange={(e) => setEmail(e.target.value)}
-//                     className="w-full border rounded p-2"
-//                     required
-//                 />
-//                 <input
-//                     type="password"
-//                     placeholder="كلمة المرور"
-//                     value={password}
-//                     onChange={(e) => setPassword(e.target.value)}
-//                     className="w-full border rounded p-2"
-//                     required
-//                 />
-//                 <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded">
-//                     دخول
-//                 </button>
-//             </form>
-//         </div>
-//     );
-// }
-
-
 'use client';
-import { signIn } from 'next-auth/react';
+
 import { useState } from 'react';
+import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { ArrowRightOnRectangleIcon } from '@heroicons/react/24/solid';
+import Link from 'next/link';
 
 export default function LoginPage() {
     const router = useRouter();
@@ -104,9 +21,6 @@ export default function LoginPage() {
             password,
             callbackUrl: '/dashboard/profile',
         });
-        
-        console.log('signIn response:', res); // تحقق من هذه البيانات
-
 
         if (res?.error) {
             setError('بيانات الدخول غير صحيحة');
@@ -116,31 +30,60 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow">
-            <h2 className="text-2xl font-bold mb-4">تسجيل الدخول</h2>
-            {error && <p className="text-red-600 mb-4">{error}</p>}
-            <form onSubmit={handleLogin} className="space-y-4">
-                <input
-                    type="email"
-                    placeholder="البريد الإلكتروني"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full border rounded p-2"
-                    required
-                />
-                <input
-                    type="password"
-                    placeholder="كلمة المرور"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full border rounded p-2"
-                    required
-                />
-                <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded">
-                    دخول
-                </button>
-            </form>
+        <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4">
+            <div className="max-w-md w-full bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8">
+                <div className="flex items-center mb-6">
+                    <ArrowRightOnRectangleIcon className="w-8 h-8 text-blue-600 dark:text-blue-400 ml-2" />
+                    <h2 className="text-2xl font-bold text-gray-800 dark:text-white">تسجيل الدخول</h2>
+                </div>
+
+                {error && (
+                    <div className="mb-4 text-red-600 bg-red-100 dark:bg-red-200 p-2 rounded">
+                        {error}
+                    </div>
+                )}
+
+                <form onSubmit={handleLogin} className="space-y-4">
+                    <input
+                        type="email"
+                        placeholder="البريد الإلكتروني"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full p-3 rounded border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                        required
+                    />
+                    <input
+                        type="password"
+                        placeholder="كلمة المرور"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full p-3 rounded border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                        required
+                    />
+                    <button
+                        type="submit"
+                        className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded transition"
+                    >
+                        دخول
+                    </button>
+                </form>
+
+                <div className="mt-4 text-center text-gray-600 dark:text-gray-300">
+                    <p>
+                        ليس لديك حساب؟{' '}
+                        <Link href="/register" className="text-blue-600 hover:underline font-medium">
+                            إنشاء حساب
+                        </Link>
+                    </p>
+                    <p className="mt-2">
+                        <Link href="/" className="text-sm text-gray-500 hover:underline">
+                            العودة إلى الصفحة الرئيسية
+                        </Link>
+                    </p>
+                </div>
+            </div>
         </div>
     );
 }
+
 

@@ -10,6 +10,13 @@
 /* @import 'flowbite'; */
 
 
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+
+body {
+  font-family: 'Cairo', sans-serif;
+}
+
+
 :root {
   --background: #ffffff;
   --foreground: #171717;

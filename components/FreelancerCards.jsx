@@ -1,74 +1,9 @@
-// 'use client';
-// import React, { useEffect, useState } from 'react';
-// import Link from 'next/link';
-
-// export default function FreelancerCards() {
-//     const [freelancers, setFreelancers] = useState([]);
-
-//     useEffect(() => {
-//         const fetchFreelancers = async () => {
-//             try {
-//                 const res = await fetch('/api/freelancers');
-//                 const data = await res.json();
-//                 setFreelancers(data);
-//             } catch (error) {
-//                 console.error('فشل في جلب بيانات المستقلين:', error);
-//             }
-//         };
-
-//         fetchFreelancers();
-//     }, []);
-
-//     return (
-//         <section className="py-16 bg-gray-50 dark:bg-gray-900">
-//             <div className="container mx-auto px-4">
-//                 <h2 className="text-3xl font-bold text-center mb-12 text-gray-800 dark:text-white">
-//                     مستقلونا المميزون
-//                 </h2>
-//                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-//                     {freelancers.map((freelancer) => (
-//                         <Link
-//                             href={`/freelancers/${freelancer.id}${freelancer.id}`}
-//                             key={freelancer.id}
-//                             className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-md transition p-6 text-center"
-//                         >
-//                             <img
-//                                 src={freelancer.avatar || '/images/default-avatar.png'}
-//                                 alt={freelancer.name}
-//                                 className="w-24 h-24 rounded-full mx-auto mb-4 object-cover"
-//                             />
-//                             <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
-//                                 {freelancer.name}
-//                             </h3>
-
-//                             {freelancer.bio && (
-//                                 <p className="text-gray-500 dark:text-gray-300 text-sm mt-1 line-clamp-2">
-//                                     {freelancer.bio}
-//                                 </p>
-//                             )}
-
-//                             {freelancer.description && (
-//                                 <p className="text-gray-600 dark:text-gray-400 text-sm mt-2 line-clamp-3">
-//                                     {freelancer.description.slice(0, 120)}...
-//                                 </p>
-//                             )}
-//                         </Link>
-//                     ))}
-
-//                 </div>
-//             </div>
-//         </section>
-//     );
-// }
-
-
-// 
-
-
 'use client';
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { FaStar } from 'react-icons/fa';
+import { FaUserCircle } from 'react-icons/fa';
 
 export default function FreelancerCards() {
     const [freelancers, setFreelancers] = useState([]);
@@ -105,11 +40,7 @@ export default function FreelancerCards() {
     }
 
     if (error) {
-        return (
-            <div className="text-center py-10 text-red-500">
-                {error}
-            </div>
-        );
+        return <div className="text-center py-10 text-red-500">{error}</div>;
     }
 
     if (!freelancers.length) {
@@ -121,39 +52,63 @@ export default function FreelancerCards() {
     }
 
     return (
-        <section className="py-16 bg-gray-50 dark:bg-gray-900">
+        <section className="py-16 bg-gray-100 dark:bg-gray-900">
             <div className="container mx-auto px-4">
-                <h2 className="text-3xl font-bold text-center mb-12 text-gray-800 dark:text-white">
+                <h2 className="text-3xl font-extrabold text-center mb-12 text-gray-800 dark:text-white">
                     مستقلونا الأعلى تقييماً
                 </h2>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                     {freelancers.map((freelancer) => (
                         <Link
                             href={`/freelancers/${freelancer.id}`}
                             key={freelancer.id}
-                            className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex flex-col items-center text-center hover:shadow-md transition"
+                            className="bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition overflow-hidden flex flex-col items-center text-center p-6"
                         >
-                            <img
-                                src={freelancer.avatar || '/default-avatar.png'}
-                                alt={freelancer.name}
-                                className="w-24 h-24 rounded-full mx-auto mb-4 object-cover"
-                            />
-                            <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
+                            <div className="relative w-24 h-24">
+                                {freelancer.avatar ? (
+                                    <img
+                                        src={freelancer.avatar}
+                                        alt={freelancer.name}
+                                        className="w-24 h-24 rounded-full object-cover border-4 border-blue-500"
+                                    />
+                                ) : (
+                                    <FaUserCircle className="w-24 h-24 text-gray-400 dark:text-gray-500" />
+                                )}
+                            </div>
+
+                            <h3 className="text-xl font-semibold mt-4 text-gray-800 dark:text-white">
                                 {freelancer.name}
                             </h3>
+
                             {freelancer.bio && (
-                                <p className="text-gray-500 dark:text-gray-300 text-sm mt-1 line-clamp-2">
+                                <p className="text-sm text-gray-500 dark:text-gray-300 mt-1 line-clamp-2">
                                     {freelancer.bio}
                                 </p>
                             )}
+
                             {freelancer.description && (
-                                <p className="text-gray-600 dark:text-gray-400 text-sm mt-2 line-clamp-3">
+                                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 line-clamp-3">
                                     {freelancer.description.length > 120
                                         ? freelancer.description.slice(0, 120) + '...'
                                         : freelancer.description}
                                 </p>
                             )}
+
+                            <div className="flex items-center mt-4 text-yellow-400">
+                                {[...Array(5)].map((_, i) => (
+                                    <FaStar
+                                        key={i}
+                                        className={`w-5 h-5 ${i < Math.round(freelancer.rating || 0)
+                                                ? 'text-yellow-400'
+                                                : 'text-gray-300 dark:text-gray-600'
+                                            }`}
+                                    />
+                                ))}
+                                <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
+                                    {freelancer.rating?.toFixed(1) || '0.0'}
+                                </span>
+                            </div>
                         </Link>
                     ))}
                 </div>
@@ -162,7 +117,7 @@ export default function FreelancerCards() {
                 <div className="mt-12 text-center">
                     <Link
                         href="/allFreelancers"
-                        className="inline-block bg-primary text-white px-6 py-2 rounded hover:bg-primary-dark transition"
+                        className="inline-block bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition"
                     >
                         عرض جميع المستقلين
                     </Link>
@@ -171,4 +126,3 @@ export default function FreelancerCards() {
         </section>
     );
 }
-
