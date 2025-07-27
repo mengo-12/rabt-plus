@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useEffect, useState } from "react"
@@ -59,6 +60,14 @@ export default function ProjectDetailsPage() {
             <p className="text-gray-700 mb-2">{project.description}</p>
             <p className="mb-1">الميزانية: <strong>{project.budget} ريال</strong></p>
             <p className="mb-4">الحالة: {project.status}</p>
+
+
+            {!isOwner && (
+                <p className="mb-4 text-blue-600 font-medium">
+                    للتواصل مع العميل: <span dir="ltr">{project.client?.phone || "غير متوفر"}</span>
+                </p>
+            )}
+
 
             {isOwner ? (
                 <div className="flex gap-4">

@@ -12,7 +12,8 @@ export async function GET(request, { params }) {
                     select: {
                         id: true,
                         name: true,
-                        avatar: true,
+                        phone: true, // 👈 إضافة رقم الهاتف
+                        email: true,
                     },
                 },
             },

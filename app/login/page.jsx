@@ -19,13 +19,13 @@ export default function LoginPage() {
             redirect: false,
             email,
             password,
-            callbackUrl: '/dashboard/profile',
+            callbackUrl: '/', // ✅ توجيه للصفحة الرئيسية
         });
 
         if (res?.error) {
             setError('بيانات الدخول غير صحيحة');
         } else if (res.ok) {
-            router.push('/dashboard/profile');
+            router.push('/'); // ✅ توجيه للصفحة الرئيسية
         }
     };
 
