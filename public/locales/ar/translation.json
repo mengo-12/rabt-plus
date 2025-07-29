@@ -57,7 +57,7 @@
         "freelancers": "جميع المستقلين",
         "signin_freelancers": "تسجيل حساب مستقل",
         "signin_client": "تسجيل حساب عميل",
-        "signup_btn":"إنشاء حساب",
+        "signup_btn": "إنشاء حساب",
         "have_account": "لديك حساب بالفعل؟",
         "signin_account": "تسجيل دخول",
         "signin_account_btn": "تسجيل دخول",
@@ -65,5 +65,9 @@
         "footer_rights": "جميع الحقوق محفوظة",
         "footer_terms": "الشروط",
         "footer_privacy": "الخصوصية",
-        "footer_contact": "تواصل معنا"
+        "footer_contact": "تواصل معنا",
+        "footer_about": "عن منصتنا",
+        "footer_about_desc": "منصتنا تربط المستقلين بالعملاء في بيئة موثوقة واحترافية.",
+        "footer_links": "روابط مهمة",
+        "footer_follow": "تابعنا"
 }

@@ -65,5 +65,9 @@
         "footer_rights": "All rights reserved",
         "footer_terms": "Terms",
         "footer_privacy": "Privacy",
-        "footer_contact": "Contact us"
+        "footer_contact": "Contact us",
+        "footer_about": "About Us",
+        "footer_about_desc": "Our platform connects freelancers with clients in a trusted and professional environment.",
+        "footer_links": "Important Links",
+        "footer_follow": "Follow Us"
 }
