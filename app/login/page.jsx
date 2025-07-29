@@ -69,12 +69,12 @@ export default function LoginPage() {
                 </form>
 
                 <div className="mt-4 text-center text-gray-600 dark:text-gray-300">
-                    <p>
+                    {/* <p>
                         ليس لديك حساب؟{' '}
                         <Link href="/register" className="text-blue-600 hover:underline font-medium">
                             إنشاء حساب
                         </Link>
-                    </p>
+                    </p> */}
                     <p className="mt-2">
                         <Link href="/" className="text-sm text-gray-500 hover:underline">
                             العودة إلى الصفحة الرئيسية

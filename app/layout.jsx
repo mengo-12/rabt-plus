@@ -18,7 +18,7 @@ export default function RootLayout({ children }) {
                     rel="stylesheet"
                 />
             </head>
-            <body className="font-cairo bg-white text-gray-900 dark:bg-gray-900 dark:text-white transition-colors duration-300">
+            <body className="font-cairo bg-white text-gray-900 dark:bg-gray-900 dark:text-white transition-colors duration-300 pt-20">
                 <Providers>
                     <DocumentDirection />
                     <Header />

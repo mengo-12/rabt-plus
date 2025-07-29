@@ -65,84 +65,91 @@ export default function FreelancerPage() {
     if (!freelancer) return <p className="text-center py-10 text-red-500">لم يتم العثور على المستقل.</p>
 
     return (
-        <div className="max-w-3xl mx-auto py-8 px-4">
-            <div className="flex items-center gap-4">
-                {freelancer.avatar && (
-                    <Image
-                        src={freelancer.avatar}
-                        alt={freelancer.name}
-                        width={80}
-                        height={80}
-                        className="rounded-full object-cover"
-                    />
+        <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 py-8 px-4">
+            <div className="max-w-3xl mx-auto rounded-lg shadow-md bg-white dark:bg-gray-800 p-6">
+                <div className="flex items-center gap-4">
+                    {freelancer.avatar && (
+                        <div className="w-20 h-20 relative flex-shrink-0 rounded-full overflow-hidden border-2 border-blue-500">
+                            <Image
+                                src={freelancer.avatar}
+                                alt={freelancer.name}
+                                fill
+                                className="object-cover"
+                            />
+                        </div>
+                    )}
+                    <div className="flex-1">
+                        <h1 className="text-2xl font-bold">{freelancer.name}</h1>
+                        {averageRating ? (
+                            <p>⭐ متوسط التقييم: {averageRating} / 5</p>
+                        ) : (
+                            <p>لم يتم التقييم بعد</p>
+                        )}
+                    </div>
+                </div>
+
+                {freelancer.bio && (
+                    <div className="mt-4">
+                        <h2 className="font-semibold">نبذة:</h2>
+                        <p>{freelancer.bio}</p>
+                    </div>
                 )}
-                <div>
-                    <h1 className="text-2xl font-bold">{freelancer.name}</h1>
-                    {averageRating ? (
-                        <p>⭐ متوسط التقييم: {averageRating} / 5</p>
+
+                {freelancer.description && (
+                    <div className="mt-4">
+                        <h2 className="font-semibold">الوصف التفصيلي:</h2>
+                        <p>{freelancer.description}</p>
+                    </div>
+                )}
+
+                {freelancer.cv && (
+                    <div className="mt-4">
+                        <a
+                            href={freelancer.cv}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 dark:text-blue-400 underline hover:text-blue-800 dark:hover:text-blue-300 transition"
+                        >
+                            عرض السيرة الذاتية
+                        </a>
+                    </div>
+                )}
+
+                <div className="mt-6">
+                    <h2 className="text-xl font-semibold mb-2">التقييمات:</h2>
+                    {ratings.length > 0 ? (
+                        <ul className="space-y-3">
+                            {ratings.map((r) => (
+                                <li
+                                    key={r.id}
+                                    className="border border-gray-300 dark:border-gray-700 p-3 rounded bg-gray-50 dark:bg-gray-800"
+                                >
+                                    <p>⭐ {r.rating} / 5</p>
+                                    {r.comment && <p className="mt-1">{r.comment}</p>}
+                                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                        بواسطة: {r.client?.name || "مستخدم مجهول"}
+                                    </p>
+                                </li>
+                            ))}
+                        </ul>
                     ) : (
-                        <p>لم يتم التقييم بعد</p>
+                        <p className="text-gray-600 dark:text-gray-400">لا توجد تقييمات بعد</p>
                     )}
                 </div>
-            </div>
 
-            {freelancer.bio && (
-                <div className="mt-4">
-                    <h2 className="font-semibold">نبذة:</h2>
-                    <p>{freelancer.bio}</p>
-                </div>
-            )}
+                {session?.user?.role === 'client' && !hasRated && (
+                    <div className="mt-8">
+                        <h2 className="text-xl font-semibold mb-2">أضف تقييمك:</h2>
+                        <RatingForm freelancerId={freelancer.id} onSubmitSuccess={handleNewRating} />
+                    </div>
+                )}
 
-            {freelancer.description && (
-                <div className="mt-4">
-                    <h2 className="font-semibold">الوصف التفصيلي:</h2>
-                    <p>{freelancer.description}</p>
-                </div>
-            )}
-
-            {freelancer.cv && (
-                <div className="mt-4">
-                    <a
-                        href={freelancer.cv}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 underline"
-                    >
-                        عرض السيرة الذاتية
-                    </a>
-                </div>
-            )}
-
-            <div className="mt-6">
-                <h2 className="text-xl font-semibold mb-2">التقييمات:</h2>
-                {ratings.length > 0 ? (
-                    <ul className="space-y-3">
-                        {ratings.map((r) => (
-                            <li key={r.id} className="border p-3 rounded">
-                                <p>⭐ {r.rating} / 5</p>
-                                {r.comment && <p className="mt-1">{r.comment}</p>}
-                                <p className="text-sm text-gray-500 mt-1">
-                                    بواسطة: {r.client?.name || "مستخدم مجهول"}
-                                </p>
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <p>لا توجد تقييمات بعد</p>
+                {session?.user?.role === 'client' && hasRated && (
+                    <p className="mt-4 text-green-600 dark:text-green-400">لقد قمت بتقييم هذا المستقل بالفعل.</p>
                 )}
             </div>
-
-            {session?.user?.role === 'client' && !hasRated && (
-                <div className="mt-8">
-                    <h2 className="text-xl font-semibold mb-2">أضف تقييمك:</h2>
-                    <RatingForm freelancerId={freelancer.id} onSubmitSuccess={handleNewRating} />
-                </div>
-            )}
-
-            {session?.user?.role === 'client' && hasRated && (
-                <p className="mt-4 text-green-600">لقد قمت بتقييم هذا المستقل بالفعل.</p>
-            )}
         </div>
+
     )
 }
 
