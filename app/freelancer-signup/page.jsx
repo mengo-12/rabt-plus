@@ -4,8 +4,11 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { UserPlusIcon } from '@heroicons/react/24/solid';
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
+
 
 export default function FreelancerRegisterPage() {
+    const { t } = useTranslation();
     const router = useRouter();
     const [form, setForm] = useState({
         name: '',
@@ -47,7 +50,7 @@ export default function FreelancerRegisterPage() {
             <div className="max-w-md w-full bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8">
                 <div className="flex items-center mb-6">
                     <UserPlusIcon className="w-8 h-8 text-blue-600 dark:text-blue-400 ml-2" />
-                    <h2 className="text-2xl font-bold text-gray-800 dark:text-white">تسجيل حساب مستقل</h2>
+                    <h2 className="text-2xl font-bold text-gray-800 dark:text-white">{t('signin_freelancers')}</h2>
                 </div>
 
                 {error && (
@@ -96,14 +99,15 @@ export default function FreelancerRegisterPage() {
                         type="submit"
                         className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded transition"
                     >
-                        إنشاء حساب
+                        {t('signup_btn')}
+
                     </button>
                 </form>
 
                 <p className="mt-4 text-center text-gray-600 dark:text-gray-300">
-                    لديك حساب بالفعل؟{' '}
+                    {t('have_account')}{' '}
                     <Link href="/login" className="text-blue-600 hover:underline font-medium">
-                        تسجيل الدخول
+                        {t('signin_account')}
                     </Link>
                 </p>
             </div>

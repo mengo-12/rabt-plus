@@ -5,8 +5,13 @@ import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { ArrowRightOnRectangleIcon } from '@heroicons/react/24/solid';
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
+
+
 
 export default function LoginPage() {
+        const { t } = useTranslation();
+
     const router = useRouter();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -34,7 +39,7 @@ export default function LoginPage() {
             <div className="max-w-md w-full bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8">
                 <div className="flex items-center mb-6">
                     <ArrowRightOnRectangleIcon className="w-8 h-8 text-blue-600 dark:text-blue-400 ml-2" />
-                    <h2 className="text-2xl font-bold text-gray-800 dark:text-white">تسجيل الدخول</h2>
+                    <h2 className="text-2xl font-bold text-gray-800 dark:text-white">{t('signin_account')}</h2>
                 </div>
 
                 {error && (
@@ -64,7 +69,7 @@ export default function LoginPage() {
                         type="submit"
                         className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded transition"
                     >
-                        دخول
+                        {t('signin_account_btn')}
                     </button>
                 </form>
 
@@ -77,7 +82,7 @@ export default function LoginPage() {
                     </p> */}
                     <p className="mt-2">
                         <Link href="/" className="text-sm text-gray-500 hover:underline">
-                            العودة إلى الصفحة الرئيسية
+                            {t('go_to_home')}
                         </Link>
                     </p>
                 </div>

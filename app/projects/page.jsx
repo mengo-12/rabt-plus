@@ -110,8 +110,10 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import { useTranslation } from 'react-i18next';
 
 export default function ProjectsListPage() {
+    const { t } = useTranslation();
     const [projects, setProjects] = useState([])
     const [page, setPage] = useState(1)
     const [search, setSearch] = useState('')
@@ -160,7 +162,7 @@ export default function ProjectsListPage() {
 
     return (
         <div className="min-h-screen p-6 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
-            <h1 className="text-3xl font-bold mb-8 text-center">جميع المشاريع</h1>
+            <h1 className="text-3xl font-bold mb-8 text-center">{t('projects')}</h1>
 
             {/* حقل البحث */}
             <div className="max-w-md mx-auto mb-8">

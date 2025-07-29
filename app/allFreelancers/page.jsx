@@ -110,8 +110,10 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useTranslation } from 'react-i18next';
 
 export default function AllFreelancersPage() {
+    const { t } = useTranslation();
     const [freelancers, setFreelancers] = useState([])
     const [search, setSearch] = useState('')
     const [filtered, setFiltered] = useState([])
@@ -150,7 +152,7 @@ export default function AllFreelancersPage() {
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-            <h1 className="text-3xl font-bold mb-6 text-center text-gray-900 dark:text-white">جميع المستقلين</h1>
+            <h1 className="text-3xl font-bold mb-6 text-center text-gray-900 dark:text-white">{t('freelancers')}</h1>
 
             {/* حقل البحث */}
             <div className="mb-8 max-w-md mx-auto">

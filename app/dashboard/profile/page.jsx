@@ -3,8 +3,12 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useTranslation } from 'react-i18next';
+
 
 export default function ProfilePage() {
+    const { t } = useTranslation();
+
     const router = useRouter();
     const { data: session } = useSession();
     const [name, setName] = useState("");
@@ -95,7 +99,7 @@ export default function ProfilePage() {
     };
 
     if (loading) {
-        return <p className="text-center mt-10 text-gray-700 dark:text-white">جارٍ تحميل البيانات...</p>;
+        return <p className="text-center mt-10 text-gray-700 dark:text-white">{t('profile_loading')}</p>;
     }
 
     // حذف الصورة الحالية من الخادم
@@ -145,21 +149,21 @@ export default function ProfilePage() {
                             className="mx-auto w-32 h-32 rounded-full object-cover border"
                         />
                         <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                            الصورة الحالية
+                            {t('profile_current_avatar')}
                         </p>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">الصورة الشخصية</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">{t('profile_avatar_label')}</label>
                         <div className="flex items-center space-x-2 rtl:space-x-reverse">
                             <label
                                 htmlFor="avatar-upload"
                                 className="cursor-pointer inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
                             >
-                                اختر صورة
+                                {t('choose_image')}
                             </label>
                             <span className="text-sm text-gray-600 dark:text-gray-300">
-                                {avatarFileName || "لم يتم اختيار ملف"}
+                                {avatarFileName || t('no_file_selected')}
                             </span>
                             <input
                                 id="avatar-upload"
@@ -181,23 +185,23 @@ export default function ProfilePage() {
                             onClick={handleDeleteAvatar}
                             className="mt-2 text-red-600 hover:underline text-sm"
                         >
-                            حذف الصورة الحالية
+                            {t('delete_avatar')}
                         </button>
                     )}
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
-                            السيرة الذاتية (PDF)
+                            {t('cv_label')}(PDF)
                         </label>
                         <div className="flex items-center space-x-2 rtl:space-x-reverse">
                             <label
                                 htmlFor="cv-upload"
                                 className="cursor-pointer inline-block px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
                             >
-                                اختر ملف
+                                {t('choose_file')}
                             </label>
                             <span className="text-sm text-gray-600 dark:text-gray-300">
-                                {cvFileName || "لم يتم اختيار ملف"}
+                                {cvFileName || t('no_file_selected')}
                             </span>
                             <input
                                 id="cv-upload"
@@ -218,7 +222,7 @@ export default function ProfilePage() {
                                 rel="noopener noreferrer"
                                 className="block mt-2 text-blue-600 dark:text-blue-400 underline"
                             >
-                                عرض السيرة الذاتية الحالية
+                                {t('view_current_cv')}
                             </a>
                         )}
 
@@ -228,7 +232,7 @@ export default function ProfilePage() {
                                 onClick={handleDeleteCV}
                                 className="mt-2 text-red-600 hover:underline text-sm"
                             >
-                                حذف السيرة الذاتية
+                                {t('delete_cv')}
                             </button>
                         )}
                     </div>
@@ -237,7 +241,7 @@ export default function ProfilePage() {
                 {/* الجانب الأيسر: البيانات النصية */}
                 <div className="md:col-span-2">
                     <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">
-                        تعديل الملف الشخصي
+                        {t('edit_profile')}
                     </h1>
 
                     {message && (
@@ -248,7 +252,7 @@ export default function ProfilePage() {
 
                     <form onSubmit={handleSubmit} encType="multipart/form-data" className="space-y-4">
                         <div>
-                            <label className="block mb-1 text-gray-700 dark:text-white">الاسم</label>
+                            <label className="block mb-1 text-gray-700 dark:text-white">{t('label_name')}</label>
                             <input
                                 type="text"
                                 value={name}
@@ -259,7 +263,7 @@ export default function ProfilePage() {
                         </div>
 
                         <div>
-                            <label className="block mb-1 text-gray-700 dark:text-white">البريد الإلكتروني</label>
+                            <label className="block mb-1 text-gray-700 dark:text-white">{t('label_email')}</label>
                             <input
                                 type="email"
                                 value={email}
@@ -270,7 +274,7 @@ export default function ProfilePage() {
 
                         {/* إضافة حقل رقم الهاتف */}
                         <div>
-                            <label className="block mb-1 text-gray-700 dark:text-white">رقم الهاتف</label>
+                            <label className="block mb-1 text-gray-700 dark:text-white">{t('label_phone')}</label>
                             <input
                                 type="tel"
                                 value={phone}
@@ -281,7 +285,7 @@ export default function ProfilePage() {
                         </div>
 
                         <div>
-                            <label className="block mb-1 text-gray-700 dark:text-white">نبذة قصيرة</label>
+                            <label className="block mb-1 text-gray-700 dark:text-white">{t('label_bio')}</label>
                             <textarea
                                 value={bio}
                                 onChange={(e) => setBio(e.target.value)}
@@ -292,7 +296,7 @@ export default function ProfilePage() {
                         </div>
 
                         <div>
-                            <label className="block mb-1 text-gray-700 dark:text-white">الوصف التفصيلي</label>
+                            <label className="block mb-1 text-gray-700 dark:text-white">{t('label_description')}</label>
                             <textarea
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
@@ -306,7 +310,7 @@ export default function ProfilePage() {
                             type="submit"
                             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded transition"
                         >
-                            حفظ التعديلات
+                            {t('save_changes')}
                         </button>
 
                         {role === "freelancer" && id && (
@@ -314,7 +318,7 @@ export default function ProfilePage() {
                                 href={`/freelancers/${id}`}
                                 className="text-center text-blue-600 dark:text-blue-400 underline block mt-4"
                             >
-                                عرض صفحتي العامة
+                                {t('view_public_page')}
                             </Link>
                         )}
                     </form>
