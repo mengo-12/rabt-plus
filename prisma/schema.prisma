@@ -1,12 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
-// This is your Prisma schema file.
-// Learn more: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -16,46 +7,36 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  client
-  freelancer
-}
-
 model Rating {
-  id        String   @id @default(cuid())
-  rating    Int
-  comment   String?
-  createdAt DateTime @default(now())
-
+  id           String   @id @default(cuid())
+  rating       Int
+  comment      String?
+  createdAt    DateTime @default(now())
   freelancerId String
-  freelancer   User   @relation(name: "FreelancerRatings", fields: [freelancerId], references: [id])
-
-  clientId String
-  client   User   @relation(name: "ClientRatings", fields: [clientId], references: [id])
+  clientId     String
+  client       User     @relation("ClientRatings", fields: [clientId], references: [id])
+  freelancer   User     @relation("FreelancerRatings", fields: [freelancerId], references: [id])
 
   @@unique([freelancerId, clientId])
 }
 
 model User {
-  id          String   @id @default(cuid())
-  name        String
-  email       String   @unique
-  password    String
-  role        Role
-  phone       String?  // <- أضف هذا السطر ليصبح رقم الهاتف اختياري
-  bio         String?
-  description String?
-  avatar      String?
-  cv          String?
-  rating      Float?   @default(0)
-  createdAt   DateTime @default(now())
-
-  // العلاقات العكسية
-  freelancerRatings Rating[] @relation("FreelancerRatings")
-  clientRatings     Rating[] @relation("ClientRatings")
-
-  projects  Project[]  @relation("ClientProjects") // المشاريع التي أنشأها العميل
-  proposals Proposal[] @relation("FreelancerProposals") // العروض التي قدمها المستقل
+  id                String     @id @default(cuid())
+  name              String
+  email             String     @unique
+  password          String
+  role              Role
+  phone             String?
+  bio               String?
+  description       String?
+  avatar            String?
+  cv                String?
+  rating            Float?     @default(0)
+  createdAt         DateTime   @default(now())
+  projects          Project[]  @relation("ClientProjects")
+  proposals         Proposal[] @relation("FreelancerProposals")
+  clientRatings     Rating[]   @relation("ClientRatings")
+  freelancerRatings Rating[]   @relation("FreelancerRatings")
 }
 
 model Project {
@@ -75,7 +56,12 @@ model Proposal {
   price        Float
   createdAt    DateTime @default(now())
   projectId    String
-  project      Project  @relation(fields: [projectId], references: [id])
   freelancerId String
   freelancer   User     @relation("FreelancerProposals", fields: [freelancerId], references: [id])
+  project      Project  @relation(fields: [projectId], references: [id])
+}
+
+enum Role {
+  client
+  freelancer
 }
