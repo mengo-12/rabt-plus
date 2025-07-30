@@ -85,8 +85,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/authOptions";
 import { NextResponse } from "next/server";
 import { prisma } from "../../../lib/prisma";
-import { writeFile } from "fs/promises";
+import { writeFile, mkdir } from "fs/promises";
 import path from "path";
+import fs from "fs";
 
 export async function GET(req) {
     const session = await getServerSession(authOptions);
@@ -141,18 +142,25 @@ export async function PUT(req) {
         if (description) updatedData.description = description;
         if (phone) updatedData.phone = phone;
 
+        const uploadDir = path.join(process.cwd(), "public/uploads");
+        if (!fs.existsSync(uploadDir)) {
+            await mkdir(uploadDir, { recursive: true });
+        }
+
+        // رفع السيرة الذاتية
         if (file && typeof file.name === "string") {
             const bytes = await file.arrayBuffer();
             const buffer = Buffer.from(bytes);
-            const filePath = path.join("public/uploads", file.name);
+            const filePath = path.join(uploadDir, file.name);
             await writeFile(filePath, buffer);
             updatedData.cv = `/uploads/${file.name}`;
         }
 
+        // رفع الصورة الشخصية
         if (avatar && typeof avatar.name === "string") {
             const bytes = await avatar.arrayBuffer();
             const buffer = Buffer.from(bytes);
-            const filePath = path.join("public/uploads", avatar.name);
+            const filePath = path.join(uploadDir, avatar.name);
             await writeFile(filePath, buffer);
             updatedData.avatar = `/uploads/${avatar.name}`;
         }
@@ -162,12 +170,13 @@ export async function PUT(req) {
             data: updatedData,
         });
 
-        return NextResponse.json(updatedUser);
+        return NextResponse.json({ message: "تم تحديث البيانات بنجاح", user: updatedUser });
     } catch (error) {
-        console.error("🔴 Error in PUT /api/profile:", error);
+        console.error("API Error:", error);
         return NextResponse.json(
-            { message: "حدث خطأ في السيرفر", error: error.message },
+            { message: "حدث خطأ أثناء التحديث", error: error.message },
             { status: 500 }
         );
     }
 }
+
