@@ -114,6 +114,8 @@ export async function GET(req) {
             },
         });
 
+        console.log('GET user profile:', user); // ✅ تحقق من البيانات
+
         if (!user) {
             return NextResponse.json({ error: 'المستخدم غير موجود' }, { status: 404 });
         }
@@ -164,6 +166,7 @@ export async function PUT(req) {
             });
 
             avatarUrl = avatarUpload.secure_url;
+            console.log('Uploaded avatar URL:', avatarUrl); // ✅ تأكد من رابط الصورة
         }
 
         if (cvFile && cvFile.name) {
@@ -186,6 +189,7 @@ export async function PUT(req) {
             });
 
             cvUrl = cvUpload.secure_url;
+            console.log('Uploaded CV URL:', cvUrl); // ✅ تأكد من رابط ملف الـ PDF
         }
 
         const updatedUser = await prisma.user.update({
@@ -200,12 +204,15 @@ export async function PUT(req) {
             },
         });
 
+        console.log('Updated user:', updatedUser); // ✅ تحقق من بيانات المستخدم بعد التحديث
+
         return NextResponse.json({ success: true, user: updatedUser });
     } catch (error) {
         console.error('❌ خطأ أثناء تحديث الملف الشخصي:', error);
         return NextResponse.json({ error: 'خطأ داخلي في الخادم' }, { status: 500 });
     }
 }
+
 
 
 
