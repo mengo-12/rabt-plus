@@ -350,6 +350,7 @@ export default function ProfilePage() {
 
     const [preview, setPreview] = useState('');
     const [cvName, setCvName] = useState('');
+    const [cvUrl, setCvUrl] = useState('');
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -361,8 +362,10 @@ export default function ProfilePage() {
 
         const fetchProfile = async () => {
             try {
-                const res = await fetch('/api/profile');
+                const res = await fetch('/api/profile?email=' + encodeURIComponent(session?.user?.email || ''));
                 const data = await res.json();
+
+                console.log('Profile fetched data:', data); // ✅ طباعة بيانات الملف الشخصي
 
                 if (res.ok) {
                     setFormData({
@@ -374,7 +377,9 @@ export default function ProfilePage() {
                         cv: null
                     });
                     setPreview(data.avatar || '');
+                    setCvUrl(data.cv || '');
                     setCvName(data.cv ? data.cv.split('/').pop() : '');
+
                 } else {
                     setMessage(`❌ ${data.error || 'فشل في جلب البيانات'}`);
                 }
@@ -383,9 +388,10 @@ export default function ProfilePage() {
             }
         };
 
-        fetchProfile();
-    }, [status]);
-
+        if (session?.user?.email) {
+            fetchProfile();
+        }
+    }, [status, session?.user?.email]);
     const handleChange = (e) => {
         const { name, value, files } = e.target;
 
@@ -515,9 +521,20 @@ export default function ProfilePage() {
                         onChange={handleChange}
                         className="w-full"
                     />
-                    {cvName && (
-                        <p className="mt-1 text-sm text-gray-600">📄 {cvName}</p>
+                    {cvName && cvUrl && (
+                        <p className="mt-1 text-sm text-gray-600">
+                            📄{' '}
+                            <a
+                                href={cvUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 underline"
+                            >
+                                {cvName}
+                            </a>
+                        </p>
                     )}
+
                 </div>
 
                 <button
