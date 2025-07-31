@@ -351,26 +351,35 @@ export default function ProfilePage() {
     const [preview, setPreview] = useState('');
     const [cvName, setCvName] = useState('');
     const [message, setMessage] = useState('');
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (status === 'unauthenticated') {
             router.push('/login');
+            return;
         }
 
         const fetchProfile = async () => {
-            const res = await fetch('/api/profile');
-            const data = await res.json();
-            if (res.ok) {
-                setFormData({
-                    name: data.name || '',
-                    bio: data.bio || '',
-                    description: data.description || '',
-                    phone: data.phone || '',
-                    avatar: null,
-                    cv: null
-                });
-                setPreview(data.avatar || '');
-                setCvName(data.cv ? data.cv.split('/').pop() : '');
+            try {
+                const res = await fetch('/api/profile');
+                const data = await res.json();
+
+                if (res.ok) {
+                    setFormData({
+                        name: data.name || '',
+                        bio: data.bio || '',
+                        description: data.description || '',
+                        phone: data.phone || '',
+                        avatar: null,
+                        cv: null
+                    });
+                    setPreview(data.avatar || '');
+                    setCvName(data.cv ? data.cv.split('/').pop() : '');
+                } else {
+                    setMessage(`❌ ${data.error || 'فشل في جلب البيانات'}`);
+                }
+            } catch (err) {
+                setMessage('❌ حدث خطأ أثناء تحميل البيانات');
             }
         };
 
@@ -394,22 +403,37 @@ export default function ProfilePage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setMessage('');
+        setLoading(true);
+
+        if (!session?.user?.email) {
+            setMessage('❌ لم يتم العثور على البريد الإلكتروني للمستخدم');
+            setLoading(false);
+            return;
+        }
 
         const body = new FormData();
+        body.append('email', session.user.email);
+
         Object.entries(formData).forEach(([key, value]) => {
             if (value) body.append(key, value);
         });
 
-        const res = await fetch('/api/profile', {
-            method: 'PUT',
-            body
-        });
+        try {
+            const res = await fetch('/api/profile', {
+                method: 'PUT',
+                body
+            });
 
-        const result = await res.json();
-        if (res.ok) {
-            setMessage('✅ تم تحديث البيانات بنجاح');
-        } else {
-            setMessage(`❌ ${result.message || 'حدث خطأ ما'}`);
+            const result = await res.json();
+            if (res.ok) {
+                setMessage('✅ تم تحديث البيانات بنجاح');
+            } else {
+                setMessage(`❌ ${result.error || 'حدث خطأ أثناء التحديث'}`);
+            }
+        } catch (err) {
+            setMessage('❌ فشل الاتصال بالخادم');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -417,7 +441,11 @@ export default function ProfilePage() {
         <div className="max-w-xl mx-auto p-4">
             <h1 className="text-2xl font-bold mb-4">{t('ملفي الشخصي')}</h1>
 
-            {message && <p className="mb-4 text-center text-sm text-red-500">{message}</p>}
+            {message && (
+                <p className={`mb-4 text-center text-sm ${message.startsWith('✅') ? 'text-green-600' : 'text-red-500'}`}>
+                    {message}
+                </p>
+            )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
@@ -494,11 +522,14 @@ export default function ProfilePage() {
 
                 <button
                     type="submit"
-                    className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded"
+                    className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded disabled:opacity-50"
+                    disabled={loading}
                 >
-                    {t('تحديث')}
+                    {loading ? t('جاري التحديث...') : t('تحديث')}
                 </button>
             </form>
         </div>
     );
 }
+
+

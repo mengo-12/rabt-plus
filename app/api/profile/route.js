@@ -84,7 +84,6 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { v2 as cloudinary } from 'cloudinary';
-import formidable from 'formidable';
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -92,53 +91,123 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export const config = {
-    api: {
-        bodyParser: false,
-    },
-};
-
 const prisma = new PrismaClient();
+
+export async function GET(req) {
+    try {
+        const { searchParams } = new URL(req.url);
+        const email = searchParams.get('email');
+
+        if (!email) {
+            return NextResponse.json({ error: 'البريد الإلكتروني مفقود' }, { status: 400 });
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { email },
+            select: {
+                name: true,
+                phone: true,
+                bio: true,
+                description: true,
+                avatar: true,
+                cv: true,
+            },
+        });
+
+        if (!user) {
+            return NextResponse.json({ error: 'المستخدم غير موجود' }, { status: 404 });
+        }
+
+        return NextResponse.json(user);
+    } catch (error) {
+        console.error('❌ خطأ أثناء جلب البيانات:', error);
+        return NextResponse.json({ error: 'خطأ داخلي في الخادم' }, { status: 500 });
+    }
+}
 
 export async function PUT(req) {
     try {
-        const form = formidable({ multiples: false });
+        const formData = await req.formData();
 
-        const { fields, files } = await new Promise((resolve, reject) => {
-            form.parse(req, (err, fields, files) => {
-                if (err) reject(err);
-                resolve({ fields, files });
-            });
-        });
+        const email = formData.get('email');
+        const name = formData.get('name');
+        const phone = formData.get('phone');
+        const bio = formData.get('bio');
+        const description = formData.get('description');
+        const avatarFile = formData.get('avatar');
+        const cvFile = formData.get('cv');
 
-        const { name, email } = fields;
-        const cvFile = files.cv;
+        if (!email) {
+            return NextResponse.json({ error: 'البريد الإلكتروني مفقود' }, { status: 400 });
+        }
 
+        let avatarUrl = null;
         let cvUrl = null;
 
-        if (cvFile) {
-            const uploaded = await cloudinary.uploader.upload(cvFile.filepath, {
-                folder: 'cv_files',
-                resource_type: 'raw', // يدعم pdf, docx, zip إلخ
+        if (avatarFile && avatarFile.name) {
+            const avatarBuffer = Buffer.from(await avatarFile.arrayBuffer());
+
+            const avatarUpload = await new Promise((resolve, reject) => {
+                const stream = cloudinary.uploader.upload_stream(
+                    {
+                        folder: 'avatars',
+                        resource_type: 'image',
+                        public_id: avatarFile.name.split('.')[0],
+                    },
+                    (error, result) => {
+                        if (error) reject(error);
+                        else resolve(result);
+                    }
+                );
+
+                stream.end(avatarBuffer);
             });
 
-            cvUrl = uploaded.secure_url;
+            avatarUrl = avatarUpload.secure_url;
+        }
+
+        if (cvFile && cvFile.name) {
+            const cvBuffer = Buffer.from(await cvFile.arrayBuffer());
+
+            const cvUpload = await new Promise((resolve, reject) => {
+                const stream = cloudinary.uploader.upload_stream(
+                    {
+                        folder: 'cv_files',
+                        resource_type: 'raw',
+                        public_id: cvFile.name.split('.')[0],
+                    },
+                    (error, result) => {
+                        if (error) reject(error);
+                        else resolve(result);
+                    }
+                );
+
+                stream.end(cvBuffer);
+            });
+
+            cvUrl = cvUpload.secure_url;
         }
 
         const updatedUser = await prisma.user.update({
             where: { email },
             data: {
                 name,
-                cv: cvUrl,
+                phone,
+                bio,
+                description,
+                ...(avatarUrl && { avatar: avatarUrl }),
+                ...(cvUrl && { cv: cvUrl }),
             },
         });
 
         return NextResponse.json({ success: true, user: updatedUser });
     } catch (error) {
-        console.error('❌ Error updating profile:', error);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        console.error('❌ خطأ أثناء تحديث الملف الشخصي:', error);
+        return NextResponse.json({ error: 'خطأ داخلي في الخادم' }, { status: 500 });
     }
 }
+
+
 
 
 
