@@ -171,12 +171,14 @@ import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
 import Button from '@/components/ui/Button';
 import { useSession, signOut } from 'next-auth/react';
+import { Menu, X } from 'lucide-react';
 
 export default function Header() {
     const { t, i18n: i18nextInstance } = useTranslation();
     const [darkMode, setDarkMode] = useState(false);
     const { data: session } = useSession();
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const dropdownRef = useRef(null);
 
     const toggleLanguage = () => {
@@ -221,6 +223,15 @@ export default function Header() {
                     {t('header_brand')}
                 </Link>
 
+                {/* زر القائمة للجوال */}
+                <button
+                    className="md:hidden text-gray-800 dark:text-white"
+                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                >
+                    {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                </button>
+
+                {/* روابط سطح المكتب */}
                 <nav className="hidden md:flex items-center gap-6 font-medium">
                     <Link href="/" className="text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition">
                         {t('nav_home')}
@@ -237,6 +248,26 @@ export default function Header() {
                         {t('nav_contact')}
                     </Link>
                 </nav>
+
+                {/* روابط الجوال */}
+                {mobileMenuOpen && (
+                    <nav className="absolute top-16 left-0 w-full bg-white dark:bg-gray-900 flex flex-col items-center gap-4 py-4 md:hidden z-40 shadow-md font-medium">
+                        <Link href="/" onClick={() => setMobileMenuOpen(false)} className="text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400">
+                            {t('nav_home')}
+                        </Link>
+                        {session && (
+                            <Link href="/projects" onClick={() => setMobileMenuOpen(false)} className="text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400">
+                                {t('nav_projects')}
+                            </Link>
+                        )}
+                        <Link href="/allFreelancers" onClick={() => setMobileMenuOpen(false)} className="text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400">
+                            {t('nav_freelancers')}
+                        </Link>
+                        <Link href="/contact" onClick={() => setMobileMenuOpen(false)} className="text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400">
+                            {t('nav_contact')}
+                        </Link>
+                    </nav>
+                )}
 
                 <div className="flex items-center gap-3 relative">
                     <button
@@ -306,3 +337,4 @@ export default function Header() {
         </header>
     );
 }
+
