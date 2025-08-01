@@ -105,7 +105,12 @@ export default function FreelancerPage() {
                 {freelancer.cv && (
                     <div className="mt-4">
                         <button
-                            onClick={() => window.open(freelancer.cv, '_blank')}
+                            onClick={() =>
+                                window.open(
+                                    `https://docs.google.com/gview?url=${encodeURIComponent(freelancer.cv)}&embedded=true`,
+                                    '_blank'
+                                )
+                            }
                             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
                         >
                             عرض السيرة الذاتية
