@@ -103,15 +103,13 @@ export default function FreelancerPage() {
                 )}
 
                 {freelancer.cv && (
-                    <div className="mt-6">
-                        <h2 className="text-lg font-semibold mb-2">السيرة الذاتية:</h2>
-                        <div className="w-full h-[600px]">
-                            <iframe
-                                src={freelancer.cv}
-                                className="w-full h-full border rounded"
-                                title="السيرة الذاتية"
-                            ></iframe>
-                        </div>
+                    <div className="mt-4">
+                        <button
+                            onClick={() => window.open(freelancer.cv, '_blank')}
+                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                        >
+                            عرض السيرة الذاتية
+                        </button>
                     </div>
                 )}
 
