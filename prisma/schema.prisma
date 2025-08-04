@@ -21,9 +21,9 @@ model Rating {
 }
 
 model User {
-  id                String     @id @default(cuid())
+  id                String         @id @default(cuid())
   name              String
-  email             String     @unique
+  email             String         @unique
   password          String
   role              Role
   phone             String?
@@ -31,12 +31,16 @@ model User {
   description       String?
   avatar            String?
   cv                String?
-  rating            Float?     @default(0)
-  createdAt         DateTime   @default(now())
-  projects          Project[]  @relation("ClientProjects")
-  proposals         Proposal[] @relation("FreelancerProposals")
-  clientRatings     Rating[]   @relation("ClientRatings")
-  freelancerRatings Rating[]   @relation("FreelancerRatings")
+  rating            Float?         @default(0)
+  createdAt         DateTime       @default(now())
+  projects          Project[]      @relation("ClientProjects")
+  proposals         Proposal[]     @relation("FreelancerProposals")
+  clientRatings     Rating[]       @relation("ClientRatings")
+  freelancerRatings Rating[]       @relation("FreelancerRatings")
+  ownedTeams        Team[]         @relation("OwnedTeams")
+  teamMembers       TeamMember[]
+  notifications     Notification[] // العلاقة مع Notifications
+  messages          TeamMessage[]  @relation("UserMessages") // ✅ علاقة الرسائل
 }
 
 model Project {
@@ -61,7 +65,66 @@ model Proposal {
   project      Project  @relation(fields: [projectId], references: [id])
 }
 
+model Team {
+  id          String       @id @default(cuid())
+  name        String
+  description String?
+  rolesNeeded Json
+  ownerId     String
+  owner       User         @relation("OwnedTeams", fields: [ownerId], references: [id])
+  members     TeamMember[]
+  createdAt   DateTime     @default(now())
+  messages    TeamMessage[] @relation("TeamMessages") // ✅ علاقة الرسائل
+}
+
+model TeamMember {
+  id         String   @id @default(cuid())
+  team       Team     @relation(fields: [teamId], references: [id])
+  teamId     String
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  role       String
+  status     String   @default("pending") // pending, accepted, rejected
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model TeamMessage {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+  senderId  String
+  teamId    String
+  sender    User     @relation(fields: [senderId], references: [id], name: "UserMessages")
+  team      Team     @relation(fields: [teamId], references: [id], name: "TeamMessages")
+}
+
+model Notification {
+  id          String             @id @default(cuid())
+  userId      String
+  user        User               @relation(fields: [userId], references: [id])
+  title       String
+  message     String
+  type        NotificationType
+  data        Json?
+  isRead      Boolean            @default(false)
+  createdAt   DateTime           @default(now())
+}
+
 enum Role {
   client
   freelancer
 }
+
+enum NotificationType {
+  team_invitation
+  project_update
+  general
+}
+
+enum TeamMemberStatus {
+  invited
+  accepted
+  rejected
+}
+

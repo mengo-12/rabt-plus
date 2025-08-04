@@ -14,6 +14,10 @@ export default function FreelancerPage() {
     const [hasRated, setHasRated] = useState(false)
     const [loading, setLoading] = useState(true)
 
+    // إضافة حالة زر الدعوة
+    const [inviting, setInviting] = useState(false)
+    const [inviteResult, setInviteResult] = useState(null)
+
     useEffect(() => {
         async function fetchData() {
             try {
@@ -49,7 +53,6 @@ export default function FreelancerPage() {
 
     // دالة لتحديث التقييمات بعد إضافة تقييم جديد
     const handleNewRating = (newRating) => {
-        // ضيف بيانات العميل بناءً على الجلسة (session.user)
         const newRatingWithClient = {
             ...newRating,
             client: {
@@ -59,6 +62,30 @@ export default function FreelancerPage() {
         }
         setRatings(prev => [newRatingWithClient, ...prev])
         setHasRated(true)
+    }
+
+    // دالة إرسال دعوة الانضمام للفريق
+    const handleInviteToTeam = async () => {
+        setInviting(true)
+        setInviteResult(null)
+        try {
+            const res = await fetch('/api/teams/invite', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    freelancerId: id,
+                }),
+            })
+            const data = await res.json()
+            if (res.ok && data.success) {
+                setInviteResult({ success: true, message: 'تم إرسال الدعوة بنجاح' })
+            } else {
+                setInviteResult({ success: false, message: data.error || 'فشل إرسال الدعوة' })
+            }
+        } catch (error) {
+            setInviteResult({ success: false, message: 'خطأ في الاتصال بالخادم' })
+        }
+        setInviting(false)
     }
 
     if (loading) return <p className="text-center py-10">جاري التحميل...</p>
@@ -88,6 +115,25 @@ export default function FreelancerPage() {
                     </div>
                 </div>
 
+                {/* زر إضافة إلى الفريق يظهر فقط للعميل (client) */}
+                {session?.user?.role === 'client' && (
+                    <div className="mt-6">
+                        <button
+                            onClick={handleInviteToTeam}
+                            disabled={inviting}
+                            className={`px-4 py-2 rounded text-white ${inviting ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'}`}
+                        >
+                            {inviting ? 'جارٍ الإرسال...' : 'أضف إلى الفريق'}
+                        </button>
+                        {inviteResult && (
+                            <p className={`mt-2 ${inviteResult.success ? 'text-green-600' : 'text-red-600'}`}>
+                                {inviteResult.message}
+                            </p>
+                        )}
+                    </div>
+                )}
+
+                {/* باقي المحتوى (السيرة الذاتية، التقييمات، ... كما لديك) */}
                 {freelancer.bio && (
                     <div className="mt-4">
                         <h2 className="font-semibold">نبذة:</h2>
@@ -152,8 +198,5 @@ export default function FreelancerPage() {
                 )}
             </div>
         </div>
-
     )
 }
-
-
