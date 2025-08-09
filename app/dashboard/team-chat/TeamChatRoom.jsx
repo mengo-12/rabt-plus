@@ -1,131 +1,35 @@
-// 'use client';
-// import useSWR from 'swr';
-// import { useState } from 'react';
-
-// const fetcher = url => fetch(url).then(res => res.json());
-
-// export default function TeamChatRoom({ teamId }) {
-//     const { data, mutate } = useSWR(`/api/teams/${teamId}/messages`, fetcher, { refreshInterval: 3000 });
-//     const [message, setMessage] = useState('');
-
-//     const sendMessage = async (e) => {
-//         e.preventDefault();
-//         if (!message.trim()) return;
-
-//         await fetch(`/api/teams/${teamId}/messages`, {
-//             method: 'POST',
-//             headers: { 'Content-Type': 'application/json' },
-//             body: JSON.stringify({ content: message }),
-//         });
-
-//         setMessage('');
-//         mutate(); // Refresh messages
-//     };
-
-//     const messages = data?.messages || [];
-
-//     return (
-//         <div className="flex flex-col h-full">
-//             <div className="flex-1 overflow-y-auto space-y-2 mb-4">
-//                 {messages.map(msg => (
-//                     <div key={msg.id} className="bg-gray-100 p-2 rounded">
-//                         <strong>{msg.sender.name}:</strong> {msg.content}
-//                     </div>
-//                 ))}
-//             </div>
-//             <form onSubmit={sendMessage} className="flex">
-//                 <input
-//                     type="text"
-//                     value={message}
-//                     onChange={(e) => setMessage(e.target.value)}
-//                     className="flex-1 border rounded p-2"
-//                     placeholder="اكتب رسالة..."
-//                 />
-//                 <button type="submit" className="ml-2 bg-blue-500 text-white px-4 py-2 rounded">إرسال</button>
-//             </form>
-//         </div>
-//     );
-// }
-
-
-// app/dashboard/team-chat/TeamChatRoom.jsx
-// 'use client';
-// import useSWR from 'swr';
-// import { useState, useRef, useEffect } from 'react';
-
-// const fetcher = url => fetch(url).then(res => res.json());
-
-// export default function TeamChatRoom({ teamId, currentUserId }) {
-//     const { data, mutate } = useSWR(`/api/teams/${teamId}/messages`, fetcher, { refreshInterval: 3000 });
-//     const [message, setMessage] = useState('');
-//     const chatEndRef = useRef(null);
-
-//     const messages = data?.messages || [];
-
-//     const sendMessage = async (e) => {
-//         e.preventDefault();
-//         if (!message.trim()) return;
-
-//         await fetch(`/api/teams/${teamId}/messages`, {
-//             method: 'POST',
-//             headers: { 'Content-Type': 'application/json' },
-//             body: JSON.stringify({ content: message }),
-//         });
-
-//         setMessage('');
-//         mutate();
-//     };
-
-//     useEffect(() => {
-//         chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-//     }, [messages]);
-
-//     return (
-//         <div className="flex flex-col h-full">
-//             <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50 dark:bg-gray-900">
-//                 {messages.map(msg => (
-//                     <div key={msg.id} className={`flex ${msg.sender.id === currentUserId ? 'justify-end' : 'justify-start'}`}>
-//                         <div className={`max-w-xs p-3 rounded-xl ${
-//                             msg.sender.id === currentUserId 
-//                                 ? 'bg-blue-500 text-white rounded-br-none' 
-//                                 : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-bl-none'
-//                         }`}>
-//                             <p className="text-sm">{msg.content}</p>
-//                         </div>
-//                     </div>
-//                 ))}
-//                 <div ref={chatEndRef} />
-//             </div>
-//             <form onSubmit={sendMessage} className="p-4 border-t flex bg-white dark:bg-gray-800">
-//                 <input
-//                     type="text"
-//                     value={message}
-//                     onChange={(e) => setMessage(e.target.value)}
-//                     className="flex-1 border rounded-full px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none"
-//                     placeholder="اكتب رسالة..."
-//                 />
-//                 <button type="submit" className="ml-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full">
-//                     إرسال
-//                 </button>
-//             </form>
-//         </div>
-//     );
-// }
-
 'use client';
 import useSWR from 'swr';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 const fetcher = url => fetch(url).then(res => res.json());
 
 export default function TeamChatRoom({ teamId }) {
     const { data, mutate } = useSWR(`/api/teams/${teamId}/messages`, fetcher, { refreshInterval: 3000 });
+    const { data: teamData } = useSWR(`/api/teams/${teamId}`, fetcher);
     const { data: userData } = useSWR('/api/me', fetcher);
 
     const [message, setMessage] = useState('');
+    const messagesEndRef = useRef(null);
 
     const messages = data?.messages || [];
     const currentUserId = userData?.user?.id;
+
+    const isMemberAccepted = teamData?.members?.some(
+        m => m.userId === currentUserId && m.status === 'accepted'
+    );
+
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [messages]);
+
+    if (teamData && !isMemberAccepted) {
+        return (
+            <div className="flex items-center justify-center min-h-screen text-gray-500 p-4 text-center">
+                تم طردك من هذا الفريق ولا يمكنك إرسال رسائل.
+            </div>
+        );
+    }
 
     const sendMessage = async (e) => {
         e.preventDefault();
@@ -138,47 +42,77 @@ export default function TeamChatRoom({ teamId }) {
         });
 
         setMessage('');
-        mutate(); // Refresh messages
+        mutate();
     };
 
     return (
-        <div className="flex flex-col h-[500px] w-[400px] bg-white dark:bg-gray-900 shadow rounded-lg overflow-hidden mx-auto">
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {messages.map(msg => (
-                    <div key={msg.id} className={`flex ${msg.senderId === currentUserId ? 'justify-end' : 'justify-start'}`}>
-                        <div className="flex items-end space-x-2">
-                            {msg.senderId !== currentUserId && (
-                                <img src={msg.sender.avatar || '/default-avatar.png'} alt="Avatar" className="w-8 h-8 rounded-full" />
-                            )}
-                            <div className={`p-3 rounded-xl ${msg.senderId === currentUserId ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-black dark:text-white'}`}>
-                                <p className="text-xs font-semibold mb-1">{msg.sender.name}</p>
-                                <p>{msg.content}</p>
+        <div className="flex flex-col h-screen w-full max-w-4xl mx-auto bg-gray-100 dark:bg-gray-900">
+            {/* الرسائل */}
+            <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
+                {messages.map(msg => {
+                    const isCurrentUser = msg.senderId === currentUserId;
+                    return (
+                        <div key={msg.id} className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}>
+                            <div className={`flex items-end space-x-2 max-w-[80%] sm:max-w-[70%] break-words ${isCurrentUser ? 'flex-row-reverse space-x-reverse' : ''}`}>
+                                {/* صورة المستخدم */}
+                                <img
+                                    src={msg.sender.avatar || '/default-avatar.png'}
+                                    alt="Avatar"
+                                    className="w-8 h-8 rounded-full border border-gray-300"
+                                />
+
+                                {/* الفقاعة مع الذيول */}
+                                <div
+                                    className={`relative rounded-2xl p-3 text-sm sm:text-base shadow-md
+                                        ${isCurrentUser ? 'bg-green-500 text-white' : 'bg-white dark:bg-gray-700 dark:text-white'}
+                                    `}
+                                    style={{
+                                        borderTopRightRadius: isCurrentUser ? '0' : '1rem',
+                                        borderTopLeftRadius: isCurrentUser ? '1rem' : '0'
+                                    }}
+                                >
+                                    {/* الذيول */}
+                                    <span
+                                        className={`absolute bottom-0 w-0 h-0 border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent
+                                            ${isCurrentUser
+                                                ? 'right-[-8px] border-l-[10px] border-l-green-500'
+                                                : 'left-[-8px] border-r-[10px] border-r-white dark:border-r-gray-700'
+                                            }
+                                        `}
+                                    ></span>
+
+                                    <p className="font-semibold mb-1">{msg.sender.name}</p>
+                                    <p>{msg.content}</p>
+                                    <span className="text-[10px] text-gray-200 dark:text-gray-400 absolute bottom-1 right-2">
+                                        {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    </span>
+                                </div>
                             </div>
-                            {msg.senderId === currentUserId && (
-                                <img src={msg.sender.avatar || '/default-avatar.png'} alt="Avatar" className="w-8 h-8 rounded-full" />
-                            )}
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
+                <div ref={messagesEndRef}></div>
             </div>
 
-            {/* Send Message Form */}
-            <form onSubmit={sendMessage} className="p-2 border-t dark:border-gray-700 flex items-center">
+            {/* إرسال الرسائل */}
+            <form onSubmit={sendMessage} className="p-2 border-t dark:border-gray-700 flex items-center gap-2 bg-white dark:bg-gray-800">
                 <input
                     type="text"
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    className="flex-1 border rounded-full px-4 py-2 focus:outline-none dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                    className="flex-1 border rounded-full px-3 py-2 focus:outline-none text-sm sm:text-base dark:bg-gray-900 dark:border-gray-600 dark:text-white"
                     placeholder="اكتب رسالة..."
                 />
-                <button type="submit" className="ml-2 bg-blue-500 text-white px-4 py-2 rounded-full">إرسال</button>
+                <button
+                    type="submit"
+                    className="bg-green-500 hover:bg-green-600 text-white px-3 sm:px-4 py-2 rounded-full text-sm sm:text-base"
+                >
+                    إرسال
+                </button>
             </form>
         </div>
     );
 }
-
-
 
 
 
